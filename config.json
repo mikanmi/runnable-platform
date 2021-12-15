@@ -1,0 +1,157 @@
+{
+    "bridge": {
+        "name": "Mayu",
+        "username": "0E:26:1F:4A:39:CB",
+        "manufacturer": "Patineboot",
+        "model": "homebridge",
+        "port": 51806,
+        "pin": "786-75-706",
+        "advertiser": "ciao"
+    },
+    "accessories": [],
+    "platforms": [
+        {
+            "name": "Config",
+            "port": 8581,
+            "auth": "none",
+            "theme": "auto",
+            "tempUnits": "c",
+            "lang": "auto",
+            "platform": "config"
+        },
+        {
+            "platform": "DysonPlatform",
+            "name": "DysonPlatform",
+            "accessories": [
+                {
+                    "displayName": "DysonFan",
+                    "ip": "DYSON-IP",
+                    "serialNumber": "DYSON-SERIALNUMBER",
+                    "password": "DYSON-PASSWORD",
+                    "focusModeVisible": false
+                }
+            ]
+        },
+        {
+            "name": "Hue",
+            "anyOn": true,
+            "effects": true,
+            "hosts": [
+                "mayu.local:80"
+            ],
+            "lights": true,
+            "resource": true,
+            "platform": "Hue",
+            "users": {
+                "HUE-ATTRIBUTE": "HUE-VALUE"
+            }
+        },
+        {
+            "platform": "Cmd4",
+            "name": "Cmd4",
+            "outputConstants": true,
+            "Cmd4_Mode": "FullyPolled",
+            "accessories": [
+                {
+                    "type": "Lightbulb",
+                    "displayName": "BrightLight",
+                    "on": "FALSE",
+                    "brightness": 0,
+                    "colorTemperature": 0,
+                    "name": "BrightLight",
+                    "Manufacturer": "Patineboot",
+                    "Model": "Patineboot model",
+                    "SerialNumber": "Panasonic",
+                    "polling": [
+                        {
+                            "characteristic": "on",
+                            "interval": 65535
+                        },
+                        {
+                            "characteristic": "brightness",
+                            "interval": 65535
+                        },
+                        {
+                            "characteristic": "colorTemperature",
+                            "interval": 65535
+                        }
+                    ],
+                    "stateChangeResponseTime": 10,
+                    "state_cmd": "/var/opt/homeremote/infrared_device.py"
+                },
+                {
+                    "type": "Lightbulb",
+                    "displayName": "DimLight",
+                    "on": "FALSE",
+                    "brightness": 0,
+                    "colorTemperature": 0,
+                    "name": "DimLight",
+                    "Manufacturer": "Patineboot",
+                    "Model": "Patineboot model",
+                    "SerialNumber": "Panasonic",
+                    "polling": [
+                        {
+                            "characteristic": "on",
+                            "interval": 65535
+                        },
+                        {
+                            "characteristic": "brightness",
+                            "interval": 65535
+                        },
+                        {
+                            "characteristic": "colorTemperature",
+                            "interval": 65535
+                        }
+                    ],
+                    "stateChangeResponseTime": 10,
+                    "state_cmd": "/var/opt/homeremote/infrared_device.py"
+                },
+                {
+                    "type": "HeaterCooler",
+                    "displayName": "AirConditioner",
+                    "name": "AirConditioner",
+                    "temperatureDisplayUnits": "CELSIUS",
+                    "active": "INACTIVE",
+                    "currentHeaterCoolerState": "INACTIVE",
+                    "targetHeaterCoolerState": "AUTO",
+                    "currentTemperature": 20,
+                    "coolingThresholdTemperature": 35,
+                    "heatingThresholdTemperature": 25,
+                    "Manufacturer": "Patineboot",
+                    "Model": "Patineboot model",
+                    "SerialNumber": "MITSUBISHI",
+                    "polling": [
+                        {
+                            "characteristic": "active",
+                            "interval": 65535
+                        },
+                        {
+                            "characteristic": "currentHeaterCoolerState",
+                            "interval": 65535
+                        },
+                        {
+                            "characteristic": "targetHeaterCoolerState",
+                            "interval": 65535
+                        },
+                        {
+                            "characteristic": "currentTemperature",
+                            "interval": 65535
+                        },
+                        {
+                            "characteristic": "coolingThresholdTemperature",
+                            "interval": 65535
+                        },
+                        {
+                            "characteristic": "heatingThresholdTemperature",
+                            "interval": 65535
+                        }
+                    ],
+                    "stateChangeResponseTime": 10,
+                    "state_cmd": "/var/opt/homeremote/infrared_device.py"
+                }
+            ]
+        }
+    ],
+    "disabledPlugins": [
+    ]
+}
