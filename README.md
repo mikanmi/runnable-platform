@@ -8,7 +8,7 @@
 
 HomeRemote is a smart infrared remote controller.
 
-You can enjoy to control many Home Electronics and use Siri with HomeBridge and Cmd4.
+You can enjoy to control many Home Electronics and use Siri with Homebridge and Cmd4.
 
 I strongly recommend [RPZ-IR-Sensor] from Raspberry Pi HATs to send infrared code.
 
@@ -27,7 +27,7 @@ HomeRemote controls infrared devices.
 
 ## Usage
 
-HomeRemote works well with HomeBridge and [Homebridges-cmd4][Homebridges-cmd4].
+HomeRemote works well with Homebridge and [Homebridge-Cmd4][Homebridges-cmd4].
 
 HomeRemote controls Home Electronics via voice through Siri on HomePod.
 
@@ -35,7 +35,7 @@ I explain config.json infrared_device.py of HomeRemote.
 
 ### General Usage
 
-Describe `config.json` contained in HomeBridge.
+Describe `config.json` contained in Homebridge.
 
 You add `infrared_device.py` of absolute path to **state_cmd** attribute.
 
@@ -104,7 +104,7 @@ Commands to infrared HAT tools are available to set `SEND_INFRARED_COMMAND`.
 
 I require that your code conforms the following function signature.
 
-You will rewrite implemantation of this function. The present implemantation is for my environment.
+You will rewrite implementation of this function. The present implementation is for my environment.
 
 **Function Signature:**
 
@@ -113,10 +113,10 @@ class InfraredDevice:
     def __choose_infrared_code(self, interaction, level)
         """ Choose the infrared code name to build a command line.
         Args:
-            interaction: is an action of Home Electornics
+            interaction: is an action of Home Electronics
                 which is bound for user interaction on Home app on iOS.
-                The first charactor of the name is LOWERCASE
-                due to a bug of HomeBridge or CMD4.
+                The first character of the name is LOWERCASE
+                due to a bug of Homebridge or CMD4.
             level: is a level of ``interaction`` parameter.
         Returns:
             str: The name of infrared code
@@ -129,8 +129,8 @@ Choose the infrared code name to build a command line.
 
 |Parameter|Description
 |:----------|:-----------
-|`self (InfraredDevice)`|is an instance of InfraredDevice class which contains current state of Home Electornics.
-|`interaction (str)`|is an action of Home Electornics which is bound for user interaction on Home app on iOS.<br>The first charactor of the name is LOWERCASE due to a bug of HomeBridge or CMD4.
+|`self (InfraredDevice)`|is an instance of InfraredDevice class which contains current state of Home Electronics.
+|`interaction (str)`|is an action of Home Electronics which is bound for user interaction on Home app on iOS.<br>The first character of the name is LOWERCASE due to a bug of Homebridge or CMD4.
 |`level (Any)`|is a level of `interaction` parameter.
 
 **Function Return:**
@@ -142,7 +142,7 @@ Choose the infrared code name to build a command line.
 You should implement the following behavior for your preference and environment:
 
 1. Choose the infrared data code by parameters `self`, `interaction` and `level`.  
-  You can get the current device state from calling self.__device.get_value() method with interaction(same as the name of attibute).
+  You can get the current device state from calling self.__device.get_value() method with interaction(same as the name of the attribute).
 
 1. Return the infrared data code.
 
@@ -153,9 +153,9 @@ HomeRemote will send the infrared code and change `interaction` to `level`.
 ```python:infrared_device.py
     LOGGER.debug(f"STR: {interaction}, {level}")
 
-    # The special code to fix a bug of HomeBridge.
-    # Not clear HomeBrdige passing the *CASE* of name of attributes and values.
-    # I must compare atteributes on UPPERCASE.
+    # The special code to fix a bug of Homebridge.
+    # Not clear Homebridge passing the *CASE* of name of attributes and values.
+    # I must compare attributes on UPPERCASE.
     interaction = interaction.upper()
 
     if interaction != "ACTIVE" and interaction != "TARGETHEATERCOOLERSTATE":
@@ -173,9 +173,9 @@ HomeRemote will send the infrared code and change `interaction` to `level`.
         active = self.__device.get_value("active")
         heater_cooler_state = level
 
-    # The special code to fix a bug of HomeBridge.
-    # Not clear HomeBrdige passing the *CASE* of values.
-    # I must compare atteributes on UPPERCASE.
+    # The special code to fix a bug of Homebridge.
+    # Not clear Homebridge passing the *CASE* of values.
+    # I must compare attributes on UPPERCASE.
     active = active.upper()
     heater_cooler_state = heater_cooler_state.upper()
 
@@ -184,7 +184,7 @@ HomeRemote will send the infrared code and change `interaction` to `level`.
         infrared_aircon = "aircon_off"
     # ACTIVE
     elif active == "ACTIVE":
-        # AUTO, if INACTIVE or IDLE comes, perhaps HomeBrdige has some bugs.
+        # AUTO, if INACTIVE or IDLE comes, perhaps Homebridge has some bugs.
         if heater_cooler_state == "AUTO" or \
                 heater_cooler_state == "INACTIVE" or \
                 heater_cooler_state == "IDLE":
@@ -242,8 +242,8 @@ I hope that he provides documentations and examples of Homebridges-cmd4 more.
 
 ## Environment
 
-cmd4_adrsir is running but not limited with the followings.
+HomeRemote is running but not limited with the followings.
 
 - Python 3.7.3
-- Homebridges-cmd4 3.10.1
+- Homebridge-Cmd4 3.10.1
 - Homebridge 1.3.4

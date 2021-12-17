@@ -65,15 +65,18 @@
                     "polling": [
                         {
                             "characteristic": "on",
-                            "interval": 65535
+                            "interval": 65535,
+                            "Timeout": 60000
                         },
                         {
                             "characteristic": "brightness",
-                            "interval": 65535
+                            "interval": 65535,
+                            "Timeout": 60000
                         },
                         {
                             "characteristic": "colorTemperature",
-                            "interval": 65535
+                            "interval": 65535,
+                            "Timeout": 60000
                         }
                     ],
                     "stateChangeResponseTime": 10,
@@ -92,15 +95,18 @@
                     "polling": [
                         {
                             "characteristic": "on",
-                            "interval": 65535
+                            "interval": 65535,
+                            "Timeout": 60000
                         },
                         {
                             "characteristic": "brightness",
-                            "interval": 65535
+                            "interval": 65535,
+                            "Timeout": 60000
                         },
                         {
                             "characteristic": "colorTemperature",
-                            "interval": 65535
+                            "interval": 65535,
+                            "Timeout": 60000
                         }
                     ],
                     "stateChangeResponseTime": 10,
@@ -123,27 +129,33 @@
                     "polling": [
                         {
                             "characteristic": "active",
-                            "interval": 65535
+                            "interval": 65535,
+                            "Timeout": 60000
                         },
                         {
                             "characteristic": "currentHeaterCoolerState",
-                            "interval": 65535
+                            "interval": 65535,
+                            "Timeout": 60000
                         },
                         {
                             "characteristic": "targetHeaterCoolerState",
-                            "interval": 65535
+                            "interval": 65535,
+                            "Timeout": 60000
                         },
                         {
                             "characteristic": "currentTemperature",
-                            "interval": 65535
+                            "interval": 65535,
+                            "Timeout": 60000
                         },
                         {
                             "characteristic": "coolingThresholdTemperature",
-                            "interval": 65535
+                            "interval": 65535,
+                            "Timeout": 60000
                         },
                         {
                             "characteristic": "heatingThresholdTemperature",
-                            "interval": 65535
+                            "interval": 65535,
+                            "Timeout": 60000
                         }
                     ],
                     "stateChangeResponseTime": 10,
