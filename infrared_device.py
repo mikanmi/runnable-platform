@@ -53,11 +53,12 @@ CONFIG_JSON_FILE = os.path.join(SCRIPT_DIRECTORY, "config.json")
 
 
 class InfraredDevice:
-    """Infrared Device class.
+    """InfraredDevice class.
 
-    This class has the following features.
-    - Send infrared codes to Home Electronics.
-    - Get a state of Home Electronics.
+    This class changes the state of the home device with the infrared code.
+    - Send an infrared code to the infrared home device.
+    - Set the state of the infrared home device.
+    - Get the state of the infrared home device.
     """
 
     @classmethod
@@ -65,10 +66,10 @@ class InfraredDevice:
         DeviceState.initialize(LOGGER, CONFIG_JSON_FILE)
 
     def __init__(self, state_file, device_name):
-        """Create a infrared device specified ``state_file`` and ``device_name``.
+        """Create a infrared home device specified ``state_file`` and ``device_name``.
         Args:
-            state_file: The name of state file.
-            device_name: The name of device.
+            state_file: The name of the state file.
+            device_name: The name of the infrared home device.
         """
         super().__init__()
         LOGGER.debug(f"STR: {state_file}, {device_name}")
@@ -78,7 +79,7 @@ class InfraredDevice:
     def set(self, interaction, level):
         """ Send a infrared code made of ``interaction``, ``level``
         Args:
-            interaction: The action of Home Electronics.
+            interaction: The action of the infrared home device.
             level: The level of ``interaction``
         """
         LOGGER.debug(f"STR: {interaction}, {level}")
@@ -130,13 +131,12 @@ class InfraredDevice:
     def __choose_infrared_code(self, interaction, level):
         """ Choose the infrared code name to build a command line.
         Args:
-            interaction: is an action of Home Electronics
-                which is bound for user interaction on Home app on iOS.
-                The first charactor of the name is LOWERCASE
-                due to a bug of Homebridge or CMD4.
-            level: is a level of ``interaction`` parameter.
+            interaction: is an action of the infrared home device.
+                which is bound for the user interaction on Home app on iOS.
+                The first character of the name is LOWERCASE
+            level: is a level of the ``interaction`` parameter.
         Returns:
-            str: The name of infrared code
+            str: The name of the infrared code.
         """
         LOGGER.debug(f"STR: {interaction}, {level}")
 
@@ -170,9 +170,9 @@ class InfraredDevice:
     def __choose_infrared_light_common(self, interaction, level, name_prefix):
         LOGGER.debug(f"STR: {interaction}, {level}, {name_prefix}")
 
-        # The special code to fix a bug of Homebridge.
-        # Not clear Homebridge passing the *CASE* of name of attributes and values.
-        # I must compare attributes on UPPERCASE.
+        # The special code to fix a bug of Homebridge or CMD4.
+        # Not clear Homebridge passing the *CASE* of the names of the attributes and the values.
+        # I must compare the attribute on UPPERCASE.
         interaction: str = interaction.upper()
 
         if interaction != "ON" and interaction != "BRIGHTNESS":
@@ -182,7 +182,7 @@ class InfraredDevice:
         on: str
         brightness_str: str
 
-        # Get values of on and brightness attributes
+        # Get the value of the 'on' and the 'brightness' attributes
         if interaction == "ON":
             on = level
             brightness_str = self.__device.get_value("brightness")
@@ -190,18 +190,18 @@ class InfraredDevice:
             on = self.__device.get_value("on")
             brightness_str = level
 
-        # The special code to fix a bug of Homebridge.
+        # The special code to fix a bug of Homebridge or CMD4.
         # Not clear Homebridge passing the *CASE* of values.
-        # I must compare attributes on UPPERCASE.
+        # I must compare the attribute on UPPERCASE.
         on = on.upper()
         brightness = int(brightness_str)
 
-        # On interaction is false
+        # The 'On' interaction is false
         if on == "FALSE":
             infrared_bright = name_prefix + "_off"
-        # On interaction is true
+        # The 'On' interaction is true
         elif on == "TRUE":
-            # choose infrared name on Brightness.
+            # choose the infrared code name on the 'Brightness' attribute.
             # Brightness 100%.
             if brightness == 100:
                 infrared_bright = name_prefix + "_full"
@@ -221,9 +221,9 @@ class InfraredDevice:
     def __choose_infrared_aircon(self, interaction, level):
         LOGGER.debug(f"STR: {interaction}, {level}")
 
-        # The special code to fix a bug of Homebridge.
-        # Not clear Homebridge passing the *CASE* of name of attributes and values.
-        # I must compare attributes on UPPERCASE.
+        # The special code to fix a bug of Homebridge or CMD4.
+        # Not clear Homebridge passing the *CASE* of the names of the attributes and the values.
+        # I must compare the attribute on UPPERCASE.
         interaction = interaction.upper()
 
         if interaction != "ACTIVE" and interaction != "TARGETHEATERCOOLERSTATE":
@@ -233,7 +233,7 @@ class InfraredDevice:
         active: str
         heater_cooler_state: str
 
-        # Get values of on and brightness attributes
+        # Get the value of the 'on' and the 'brightness' attributes
         if interaction == "ACTIVE":
             active = level
             heater_cooler_state = self.__device.get_value("targetHeaterCoolerState")
@@ -241,9 +241,9 @@ class InfraredDevice:
             active = self.__device.get_value("active")
             heater_cooler_state = level
 
-        # The special code to fix a bug of Homebridge.
-        # Not clear Homebridge passing the *CASE* of values.
-        # I must compare attributes on UPPERCASE.
+        # The special code to fix a bug of Homebridge or CMD4.
+        # Not clear Homebridge passing the *CASE* of the names of the attributes and the values.
+        # I must compare the attribute on UPPERCASE.
         active = active.upper()
         heater_cooler_state = heater_cooler_state.upper()
 
@@ -252,7 +252,7 @@ class InfraredDevice:
             infrared_aircon = "aircon_off"
         # ACTIVE
         elif active == "ACTIVE":
-            # AUTO, if INACTIVE or IDLE comes, perhaps Homebridge has some bugs.
+            # AUTO, if INACTIVE or IDLE comes, perhaps Homebridge or CMD4 have some bugs.
             if heater_cooler_state == "AUTO":
                 infrared_aircon = "aircon_dehumidify-auto-auto"
             # HEAT
@@ -273,26 +273,23 @@ def start_process(value):
 
     InfraredDevice.initialize()
 
-    # Depend on adrsirlib and the specification required on state_cmd of homebridge-cmd4.
-    # calling ./ircontrol contained in adrsirlib, see more comments on send_infrared_data().
-
     # value[1]: is "Set" or "Get".
-    # value[2]: is value of "displayName" attribute. It is NOT "name" attribute.
-    #           "displayName" is attribute name on config.json in homebridge.
-    #           homebridge-cmd4 use "displayName" in wrong.
-    # value[3]: is name of attribute which is bound to user interaction.
-    #           First charactor of the name is UPPERCASE.
-    #           Homebridge converts the character to uppercase in wrong.
-    # value[4]: is value of value[3] attribute if value[1] is "Set", otherwise nothing.
+    # value[2]: is the value of the "displayName" attribute NOT "name" attribute.
+    #           "displayName" is the attribute name on config.json in Homebridge.
+    #           homebridge-cmd4 uses "displayName" as "name." homebridge-cmd4 has the bug.
+    # value[3]: is the name of the attribute which is bound to the user interaction.
+    #           The first charactor of the name is UPPERCASE.
+    #           Homebridge or CMD4 converts the character to uppercase in wrong.
+    # value[4]: is the value of the value[3] attribute if value[1] is "Set," otherwise nothing.
     method: str = value[1]
     device: str = value[2]
 
     # Note:
-    # Homebridge has a bug that the first character is Uppercase.
+    # Homebridge or homebridge-cmd4 has a bug that the first character is Uppercase.
     # We must add special code to fix the bug of Homebridge.
-    # Notice: Some attributes has uppercase at first character really.
-    interaction = value[3][0].lower() + value[3][1:]
+    # Notice: Actually, some attributes have an uppercase at the first character.
 
+    interaction = value[3][0].lower() + value[3][1:]
     infrared_device = InfraredDevice(STATE_FILE, device)
     print_value: str
 
@@ -304,7 +301,7 @@ def start_process(value):
         print_value = "0"
 
     elif method == "Get":
-        # put the level of interaction to stdout
+        # put the level of the interaction to stdout
         # Cmd4 retrieves the level from stdout
         print_value = infrared_device.get(interaction)
 

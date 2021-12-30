@@ -8,40 +8,39 @@
 
 HomeRemote is a smart infrared remote controller.
 
-You can enjoy to control many Home Electronics and use Siri with Homebridge and Cmd4.
+You can enjoy to control many infrared home devices and use Siri with Homebridge and Cmd4.
 
-I strongly recommend [RPZ-IR-Sensor] from Raspberry Pi HATs to send infrared code.
+I strongly recommend [RPZ-IR-Sensor][RPZ-IR-Sensor] from Raspberry Pi HATs to send an infrared code.
 
 ## Support Raspberry Pi HATs
 
-- [RPZ-IR-Sensor][RPZ-IR-Sensor] with [cgir][cgir] is the great product.
-- [ADRSIR][ADRSIR] with [adrsirlib][adrsirlib] has problems with frequently failing to send infrared codes and furthermore lack to send them to sufficient distance.
+- [RPZ-IR-Sensor][RPZ-IR-Sensor] with [cgir][cgir] is the good product.
+- [ADRSIR][ADRSIR] with [adrsirlib][adrsirlib] has some problems that it fails to send an infrared code to the device on long distances.
 
 ## HomeRemote Features
 
-HomeRemote controls infrared devices.
+HomeRemote controls the infrared home devices.
 
-- Send infrared codes to Home Electronics.
-- Get a state of Home Electronics.
-- Choose a infrared code from infrared codes registered in infrared devices.
+- Send an infrared code to the infrared home device.
+- Set the state of the infrared home device.
+- Get the state of the infrared home device.
+- Choose an infrared code from the infrared codes registered in HomeRemote.
 
 ## Usage
 
 HomeRemote works well with Homebridge and [Homebridge-Cmd4][Homebridges-cmd4].
 
-HomeRemote controls Home Electronics via voice through Siri on HomePod.
+HomeRemote controls the infrared home device via voice through Siri on HomePod.
 
-I explain config.json infrared_device.py of HomeRemote.
+I explain _config.json_ and *infrared_device.py* of HomeRemote.
 
 ### General Usage
 
-Describe `config.json` contained in Homebridge.
+Describe _config.json_ contained in Homebridge.
 
-You add `infrared_device.py` of absolute path to **state_cmd** attribute.
+You add *infrared_device.py* of the absolute path to the **state_cmd** attribute.
 
-An example for `config.json`:
-
-**e.g.**
+The example for _config.json_:
 
 ```javascript:config.json
 {
@@ -51,16 +50,12 @@ An example for `config.json`:
 
 ## Port HomeRemote to your environment
 
-1. Describe `config.json` of your preference.
-1. Configure and port `infrared_device.py` to your environment.
-
-The present files both are for my environment and preference.
+1. Describe your infrared home devices into _config.json_.
+1. Configure and port *infrared_device.py* to your environment.
 
 ## config.json
 
-Add your Home Electronics joining your Home Network.
-
-**e.g.**
+Add your infrared home devices to _config.json_:
 
 ```javascript:config.json
 {
@@ -86,14 +81,14 @@ Add your Home Electronics joining your Home Network.
 
 ### Configuration
 
-Change `SEND_INFRARED_COMMAND` variable to a command that sends infrared codes.
+Change *SEND_INFRARED_COMMAND* variable to a command sending an infrared code.
 
 ```python:infrared_device.py
 # The command of Infrared sending
 SEND_INFRARED_COMMAND: str = CGIRTOOL + " -c " + CGIRTOOL_CODE_JSON
 ```
 
-Commands to infrared HAT tools are available to set `SEND_INFRARED_COMMAND`.
+The command for RPZ-IR-Sensor is available to set *SEND_INFRARED_COMMAND*.
 
 |Recommend|Command|Description
 |:----------|:-----------|:------------
@@ -102,113 +97,94 @@ Commands to infrared HAT tools are available to set `SEND_INFRARED_COMMAND`.
 
 ### Porting
 
-I require that your code conforms the following function signature.
-
-You will rewrite implementation of this function. The present implementation is for my environment.
+You must rewrite the implementation of the *__choose_infrared_code* function.
 
 **Function Signature:**
 
 ```python:infrared_device.py
-class InfraredDevice:
-    def __choose_infrared_code(self, interaction, level)
+    def __choose_infrared_code(self, interaction, level):
         """ Choose the infrared code name to build a command line.
         Args:
-            interaction: is an action of Home Electronics
-                which is bound for user interaction on Home app on iOS.
+            interaction: is an action of the infrared home device.
+                which is bound for the user interaction on Home app on iOS.
                 The first character of the name is LOWERCASE
-                due to a bug of Homebridge or CMD4.
-            level: is a level of ``interaction`` parameter.
+            level: is a level of the ``interaction`` parameter.
         Returns:
-            str: The name of infrared code
+            str: The name of the infrared code.
         """
 ```
-
-**Function Specification:**
-
-Choose the infrared code name to build a command line.
-
-|Parameter|Description
-|:----------|:-----------
-|`self (InfraredDevice)`|is an instance of InfraredDevice class which contains current state of Home Electronics.
-|`interaction (str)`|is an action of Home Electronics which is bound for user interaction on Home app on iOS.<br>The first character of the name is LOWERCASE due to a bug of Homebridge or CMD4.
-|`level (Any)`|is a level of `interaction` parameter.
-
-**Function Return:**
-
-`Return (str)`: The name of infrared code.
 
 ### Implementation
 
 You should implement the following behavior for your preference and environment:
 
-1. Choose the infrared data code by parameters `self`, `interaction` and `level`.  
-  You can get the current device state from calling self.__device.get_value() method with interaction(same as the name of the attribute).
+1. You can get the current state of the infrared home device by calling the *self.__device.get_value()* method with interaction (same as the name of the attribute on *config.json*).
 
-1. Return the infrared data code.
+1. Choose the infrared code with the parameters *self*, *interaction*, and *level*.
 
-HomeRemote will send the infrared code and change `interaction` to `level`.
+1. Return the infrared code.
 
-**`e.g.) __choose_infrared_aircon(self, interaction, level)` function**
+HomeRemote will send the infrared code and change the *interaction* state to the *level* level.
+
+*e.g.) __choose_infrared_aircon(self, interaction, level)* function:
 
 ```python:infrared_device.py
-    LOGGER.debug(f"STR: {interaction}, {level}")
+        LOGGER.debug(f"STR: {interaction}, {level}")
 
-    # The special code to fix a bug of Homebridge.
-    # Not clear Homebridge passing the *CASE* of name of attributes and values.
-    # I must compare attributes on UPPERCASE.
-    interaction = interaction.upper()
+        # The special code to fix a bug of Homebridge or CMD4.
+        # Not clear Homebridge passing the *CASE* of the names of the attributes and the values.
+        # I must compare the attribute on UPPERCASE.
+        interaction = interaction.upper()
 
-    if interaction != "ACTIVE" and interaction != "TARGETHEATERCOOLERSTATE":
-        return
+        if interaction != "ACTIVE" and interaction != "TARGETHEATERCOOLERSTATE":
+            return
 
-    infrared_aircon = None
-    active: str
-    heater_cooler_state: str
+        infrared_aircon = None
+        active: str
+        heater_cooler_state: str
 
-    # Get values of on and brightness attributes
-    if interaction == "ACTIVE":
-        active = level
-        heater_cooler_state = self.__device.get_value("targetHeaterCoolerState")
-    elif interaction == "TARGETHEATERCOOLERSTATE":
-        active = self.__device.get_value("active")
-        heater_cooler_state = level
+        # Get the value of the 'on' and the 'brightness' attributes
+        if interaction == "ACTIVE":
+            active = level
+            heater_cooler_state = self.__device.get_value("targetHeaterCoolerState")
+        elif interaction == "TARGETHEATERCOOLERSTATE":
+            active = self.__device.get_value("active")
+            heater_cooler_state = level
 
-    # The special code to fix a bug of Homebridge.
-    # Not clear Homebridge passing the *CASE* of values.
-    # I must compare attributes on UPPERCASE.
-    active = active.upper()
-    heater_cooler_state = heater_cooler_state.upper()
+        # The special code to fix a bug of Homebridge or CMD4.
+        # Not clear Homebridge passing the *CASE* of the names of the attributes and the values.
+        # I must compare the attribute on UPPERCASE.
+        active = active.upper()
+        heater_cooler_state = heater_cooler_state.upper()
 
-    # INACTIVE
-    if active == "INACTIVE":
-        infrared_aircon = "aircon_off"
-    # ACTIVE
-    elif active == "ACTIVE":
-        # AUTO, if INACTIVE or IDLE comes, perhaps Homebridge has some bugs.
-        if heater_cooler_state == "AUTO" or \
-                heater_cooler_state == "INACTIVE" or \
-                heater_cooler_state == "IDLE":
+        # INACTIVE
+        if active == "INACTIVE":
             infrared_aircon = "aircon_off"
-        # HEAT
-        elif heater_cooler_state == "HEAT":
-            infrared_aircon = "aircon_warm-22-auto"
-        # COOL
-        elif heater_cooler_state == "COOL":
-            infrared_aircon = "aircon_cool-26-auto"
+        # ACTIVE
+        elif active == "ACTIVE":
+            # AUTO, if INACTIVE or IDLE comes, perhaps Homebridge or CMD4 have some bugs.
+            if heater_cooler_state == "AUTO":
+                infrared_aircon = "aircon_dehumidify-auto-auto"
+            # HEAT
+            elif heater_cooler_state == "HEAT":
+                infrared_aircon = "aircon_warm-22-auto"
+            # COOL
+            elif heater_cooler_state == "COOL":
+                infrared_aircon = "aircon_cool-26-auto"
 
-    LOGGER.debug(f"STR: {infrared_aircon}")
-    return infrared_aircon
+        LOGGER.debug(f"STR: {infrared_aircon}")
+        return infrared_aircon
 ```
 
 ## Misc
 
-I explain useful files included.
+I explain the useful files included in HomeRemote.
 
 - codes.json  
-  Some infrared codes for cgir.
+  Some infrared codes of cgir.
 - example.install_homeremote.sh  
-  The install script contains replacement process of sensitive information.  
-  Run the install script after change dummy-word(as `XXX`) to your real information.
+  The install script contains that the replacement process of the sensitive information.  
+  Run the install script after changing sensitive information (as `XXX`) to your information of the devices.
 
 ## Thanks
 
@@ -219,14 +195,6 @@ I explain useful files included.
 They have done great work on hardware and software.
 
 [Their GitHub page is here.][cgir]
-
-### @tokieng
-
-@tokieng created the python script which great and helpful.
-
-I was happy to find adrsirlib before.
-
-[tokieng's GitHub page is here.][adrsirlib]
 
 ### @ztalbot2000
 
@@ -242,8 +210,15 @@ I hope that he provides documentations and examples of Homebridges-cmd4 more.
 
 ## Environment
 
-HomeRemote is running but not limited with the followings.
+HomeRemote is running but not limited with the following.
 
-- Python 3.7.3
-- Homebridge-Cmd4 3.10.1
-- Homebridge 1.3.4
+- Raspberry Pi OS: GNU/Linux 10 (buster) 10.11
+- Python: 3.7.3
+- cgir: trunk on main branch
+- HomeRemote: trunk on main branch
+- Node.js: 16.13.1
+- Homebridge: 1.3.9
+  - Homebridge UI: 4.41.5
+  - Homebridge Cmd4: 4.0.1
+  - Homebridge Hue: 0.13.32
+  - Homebridge Dyson Link: 2.5.6
