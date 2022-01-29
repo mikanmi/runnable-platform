@@ -1,7 +1,7 @@
 # RunnablePlatform
 
 [RPZ-IR-Sensor]: https://www.indoorcorgielec.com/products/rpz-ir-sensor/
-[cgir]: https://github.com/patineboot/cgir
+[cgir]: https://github.com/IndoorCorgi/cgir
 [ADRSIR]: https://bit-trade-one.co.jp/product/module/adrsir/
 [adrsirlib]: https://github.com/tokieng/adrsirlib
 [Homebridges-cmd4]: https://github.com/ztalbot2000/homebridge-cmd4
@@ -213,13 +213,12 @@ RunnablePlatform supports of updating the properties for some characteristics in
 
 ## Thanks
 
-### @IndoorCorgi
+[@IndoorCorgi](https://github.com/IndoorCorgi)
 
-@IndoorCorgi developed [RPZ-IR-Sensor][RPZ-IR-Sensor] and '[cgir][cgir].'
+They created a nice Raspberry Pi HAT, [RPZ-IR-Sensor][RPZ-IR-Sensor], and a good tool, '[cgir][cgir].'
 
-They have done great work on hardware and good .
+@IndoorCorgi's '[cgir][cgir]': <https://github.com/IndoorCorgi/cgir>
 
-[Their GitHub page is here.][cgir]
 
 ## No Thanks
 
