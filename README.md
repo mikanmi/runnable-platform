@@ -164,7 +164,7 @@ RPZ-IR-Sensor is available on *SEND_INFRARED_COMMAND* default.
 |YES|`CGIRTOOL`|Send command that `cgirtool.py` contained in 'cgir' with _send_ followed.
 ||`IRCONTROL`|Send command that `ircontrol` contained in adrsirlib with _send_ followed.
 
-### Misc
+## Misc
 
 InfraredRunnable involves some useful files:
 
