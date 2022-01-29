@@ -149,6 +149,8 @@ class InfraredRunnable:
             # "CurrentHeaterCoolerState": message["status"]["CurrentHeaterCoolerState"],
             "TargetHeaterCoolerState": message["status"]["TargetHeaterCoolerState"],
             # "CurrentTemperature": message["status"]["CurrentTemperature"],
+
+            "HeatingThresholdTemperature": message["status"]["HeatingThresholdTemperature"],
         }
         state[message["characteristic"]] = message["value"]
 
@@ -209,6 +211,7 @@ class InfraredRunnable:
 
         active = state["Active"]
         target_heater_cooler_state = state["TargetHeaterCoolerState"]
+        heating_threshold_temperature = state["HeatingThresholdTemperature"]
 
         # the 'Active' element is 'INACTIVE'
         if active == 0:
@@ -224,9 +227,13 @@ class InfraredRunnable:
                 temperature = 25
             # 'HEAT' in 'TargetHeaterCoolerState'
             elif target_heater_cooler_state == 1:
-                selected_code = "aircon_warm-22-auto"
                 current_state = 2  # HEATING
-                temperature = 22
+                if heating_threshold_temperature == 25:
+                    selected_code = " aircon_warm-26-full-swing"
+                    temperature = 25
+                else:
+                    selected_code = "aircon_warm-22-auto"
+                    temperature = 22
             # 'COOL' in 'TargetHeaterCoolerState'
             elif target_heater_cooler_state == 2:
                 selected_code = "aircon_cool-26-auto"

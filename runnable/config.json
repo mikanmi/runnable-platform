@@ -48,7 +48,8 @@
                         "Active",
                         "CurrentHeaterCoolerState",
                         "TargetHeaterCoolerState",
-                        "CurrentTemperature"
+                        "CurrentTemperature",
+                        "HeatingThresholdTemperature"
                     ]
                 }
             ]
