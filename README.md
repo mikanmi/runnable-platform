@@ -8,6 +8,7 @@
 [Homebridge-Service-Type]: https://developers.homebridge.io/#/service
 
 RunnablePlatform is a software program to provide connections using your Custom-Command command between infrared devices and Homebridge.
+
 My Custom-Command, InfraredRunnable, sends infrared codes to connect two LightBulb devices and a HeaterCooler device with the Homebridge service.
 
 You can enjoy controlling your infrared home devices, a ceiling light, an air conditioner, or more joyful devices on Apple Home app on iPhone or Siri, using RunnablePlatform and your Custom-Command.
@@ -181,7 +182,7 @@ Homebridge UI provides Swagger:
   http:// [homebrdige domain or IP] /swagger
 
 - The cached accessories URL  
-  We get the current state of 'the cached accessories' on
+  We get the current state of 'the cached accessories' on  
   http:// [homebrdige domain or IP] /swagger/static/index.html#/Homebridge/ServerController_getCachedAccessories
 
 ### Ideas of RunnablePlatform feature

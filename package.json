@@ -1,9 +1,9 @@
 {
-  "private": true,
+  "private": false,
   "displayName": "Homebridge RunnablePlatform",
   "name": "homebridge-runnable-platform",
-  "version": "0.0.3",
-  "description": "RunnablePlatform provide a connection using your custom command between devices and Homebridge.",
+  "version": "0.9.0",
+  "description": "RunnablePlatform provide connections using your Custom-Command command between infrared devices and Homebridge.",
   "license": "CC BY-NC-ND 4.0",
   "repository": {
     "type": "git",
@@ -23,7 +23,8 @@
     "homebridge-plugin",
     "Infrared",
     "Remote",
-    "Command"
+    "Command",
+    "Runnable"
   ],
   "devDependencies": {
     "homebridge": "^1.4.0"

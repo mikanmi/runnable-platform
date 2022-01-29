@@ -1,9 +1,11 @@
 {
     "bridge": {
-        "name": "Homebridge",
-        "username": "0E:00:78:24:5E:EB",
-        "port": 51888,
-        "pin": "856-12-657",
+        "name": "RunnablePlatform",
+        "username": "0E:26:1F:4A:39:CB",
+        "manufacturer": "Patineboot",
+        "model": "homebridge",
+        "port": 51806,
+        "pin": "786-75-706",
         "advertiser": "avahi"
     },
     "accessories": [],
