@@ -1,0 +1,84 @@
+{
+    "bridge": {
+        "name": "Mayu",
+        "username": "0E:26:1F:4A:39:CB",
+        "manufacturer": "Patineboot",
+        "model": "homebridge",
+        "port": 51806,
+        "pin": "786-75-706",
+        "advertiser": "avahi"
+    },
+    "accessories": [],
+    "platforms": [
+        {
+            "name": "Config",
+            "port": 8581,
+            "auth": "none",
+            "theme": "auto",
+            "tempUnits": "c",
+            "lang": "auto",
+            "platform": "config"
+        },
+        {
+            "platform": "RunnablePlatform",
+            "name": "RunnablePlatform",
+            "run": "/var/opt/infrared-runnable/runnable.py",
+            "time": 300,
+            "accessories": [
+                {
+                    "name": "DimLight",
+                    "service": "Lightbulb",
+                    "characteristics": [
+                        "On",
+                        "Brightness"
+                    ]
+                },
+                {
+                    "name": "BrightLight",
+                    "service": "Lightbulb",
+                    "characteristics": [
+                        "On",
+                        "Brightness"
+                    ]
+                },
+                {
+                    "name": "AirConditioner",
+                    "service": "HeaterCooler",
+                    "characteristics": [
+                        "Active",
+                        "CurrentHeaterCoolerState",
+                        "TargetHeaterCoolerState",
+                        "CurrentTemperature"
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Hue",
+            "anyOn": true,
+            "effects": true,
+            "hosts": [
+                "HUE-HOST"
+            ],
+            "lights": true,
+            "resource": true,
+            "platform": "Hue",
+            "users": {
+                "HUE-ATTRIBUTE": "HUE-VALUE"
+            }
+        },
+        {
+            "platform": "DysonPlatform",
+            "name": "DysonPlatform",
+            "accessories": [
+                {
+                    "displayName": "DysonFan",
+                    "ip": "DYSON-IP",
+                    "serialNumber": "DYSON-SERIALNUMBER",
+                    "password": "DYSON-PASSWORD",
+                    "focusModeVisible": false
+                }
+            ]
+        }
+    ]
+}

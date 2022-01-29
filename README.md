@@ -1,224 +1,236 @@
-# HomeRemote Software
+# RunnablePlatform
 
 [RPZ-IR-Sensor]: https://www.indoorcorgielec.com/products/rpz-ir-sensor/
 [cgir]: https://github.com/patineboot/cgir
 [ADRSIR]: https://bit-trade-one.co.jp/product/module/adrsir/
 [adrsirlib]: https://github.com/tokieng/adrsirlib
 [Homebridges-cmd4]: https://github.com/ztalbot2000/homebridge-cmd4
+[Homebridge-Service-Type]: https://developers.homebridge.io/#/service
 
-HomeRemote is a smart infrared remote controller.
+RunnablePlatform is a software program to provide connections using your Custom-Command command between infrared devices and Homebridge.
+My Custom-Command, InfraredRunnable, sends infrared codes to connect two LightBulb devices and a HeaterCooler device with the Homebridge service.
 
-You can enjoy to control many infrared home devices and use Siri with Homebridge and Cmd4.
+You can enjoy controlling your infrared home devices, a ceiling light, an air conditioner, or more joyful devices on Apple Home app on iPhone or Siri, using RunnablePlatform and your Custom-Command.
 
-I strongly recommend [RPZ-IR-Sensor][RPZ-IR-Sensor] from Raspberry Pi HATs to send an infrared code.
+## Feature
 
-## Support Raspberry Pi HATs
+RunnablePlatform supports:
 
-- [RPZ-IR-Sensor][RPZ-IR-Sensor] with [cgir][cgir] is the good product.
-- [ADRSIR][ADRSIR] with [adrsirlib][adrsirlib] has some problems that it fails to send an infrared code to the device on long distances.
+- All [Service Types][Homebridge-Service-Type] of Homebridge.
+- All Characteristics of [Service Types][Homebridge-Service-Type] on Homebridge.
 
-## HomeRemote Features
+e.g., LightBulb, Heater Cooler, Humidifier Dehumidifier, Humidity Sensor, Light Sensor, Temperature Sensor, or all sort of [Homebridge API Service Types][Homebridge-Service-Type] with all Characteristics.
 
-HomeRemote controls the infrared home devices.
+## Install
 
-- Send an infrared code to the infrared home device.
-- Set the state of the infrared home device.
-- Get the state of the infrared home device.
-- Choose an infrared code from the infrared codes registered in HomeRemote.
+Search patineboot's RunnablePlatform with the 'Homebridge RunnablePlatform' words on npm or Homebridge.
+
+Install RunnablePlatform you found on npm or Homebridge.
 
 ## Usage
 
-HomeRemote works well with Homebridge and [Homebridge-Cmd4][Homebridges-cmd4].
+### Config the config.json file of Homebridge
 
-HomeRemote controls the infrared home device via voice through Siri on HomePod.
+The example of a part of RunnablePlatform on config.json.
 
-I explain _config.json_ and *infrared_device.py* of HomeRemote.
-
-### General Usage
-
-Describe _config.json_ contained in Homebridge.
-
-You add *infrared_device.py* of the absolute path to the **state_cmd** attribute.
-
-The example for _config.json_:
-
-```javascript:config.json
+```bash
 {
-    "state_cmd": "/var/opt/homeremote/infrared_device.py"
+    "platform": "RunnablePlatform",
+    "name": "RunnablePlatform",
+    "run": "/var/opt/infrared-runnable/runnable.py",
+    "time": 300,
+    "accessories": [
+        {
+            "name": "DimLight",
+            "service": "Lightbulb",
+            "characteristics": [
+                "On",
+                "Brightness"
+            ]
+        },
+    ]
 }
 ```
 
-## Port HomeRemote to your environment
+The RunnablePlatform platform element.
+|Attribute|Type|Description|
+|-|-|-|
+|platform|string|Set "_RunnablePlatform_" only.|
+|name|string|Set "_RunnablePlatform_" only.|
+|run|string|Input the absolute path of your Custom-Command to control the accessories.|
+|time|number|Input the millisecond time to finish handling a message on the Custom-Command.|
+|accessories|array of any type|See the following:|
 
-1. Describe your infrared home devices into _config.json_.
-1. Configure and port *infrared_device.py* to your environment.
+The accessories element of RunnablePlatform.
+|Attribute|Type|Description|
+|-|-|-|
+|name|string|The name of an infrared home device.|
+|service|string|The service type of the infrared home device.|
+|characteristics|array of string|The characteristics of the service.|
 
-## config.json
+Refer to Homebridge Service Types:
 
-Add your infrared home devices to _config.json_:
+- [Service Types][Homebridge-Service-Type]: <https://developers.homebridge.io/#/service>
 
-```javascript:config.json
+Get service and characteristics, e.g., Heater Cooler:
+
+1. Visit [Heater Cooler](https://developers.homebridge.io/#/service/HeaterCooler)
+2. Find the service name of Heater Cooler on the Example code.
+   Get the service name, **HeaterCooler**, from the 'this.Service.HeaterCooler' code snippet.
+
+   ```bash
+   // create a new Heater Cooler service
+   this.service = new this.Service(this.Service.HeaterCooler);
+   ```
+
+3. Get the Characteristics
+   1. Find 'Required Characteristics' and 'Optional Characteristics.'
+   1. Click the Active link to Characteristic.
+   1. Get the name, **Active**, from the 'Characteristic.Active' on the Name item.
+
+## Program the Custom-Command
+
+RunnablePlatform communicates with Custom-Command through the standard input and output.
+
+Custom-Command has the features:
+
+- Send an infrared code to your infrared home device
+- Communicate the JSON messages to RunnablePlatform.
+
+The JSON message format:
+|Attribute|Type|Description|
+|-|-|-|
+|method|string|Set '_SET_' only.|
+|name|string|The name which you describe your infrared home device on _config.json_.|
+|characteristic|string|The request that the receiver changes the characteristic.|
+|value|string|The changed value of the characteristic.|
+|status|array of any|The current characteristics of your infrared home device.|
+
+e.g., the _SET_ message that RunnablePlatform turns on the '_Your Light_' Lightbulb.
+
+_RunnablePlatform_ **--[JSON message]->** _Custom-Command_
+
+```json
 {
-    "type": "HeaterCooler",
-    "displayName": "AirConditioner",
-    "name": "AirConditioner",
-    "temperatureDisplayUnits": "CELSIUS",
-    "active": "INACTIVE",
-    "currentHeaterCoolerState": "INACTIVE",
-    "targetHeaterCoolerState": "AUTO",
-    "currentTemperature": 20,
-    "coolingThresholdTemperature": 35,
-    "heatingThresholdTemperature": 25,
-    "Manufacturer": "MITSUBISHI",
-    "Model": "Cmd4 model",
-    "SerialNumber": "Patineboot",
-    "stateChangeResponseTime": 1,
-    "state_cmd": "/var/opt/homeremote/infrared_device.py"
+    "method": "SET",
+    "name": "Your Light",
+    "characteristic": "On",
+    "value": true,
+    "status" {
+        "On": false,
+        "Brightness": 100,
+        "ColorTemperature": 500,
+        "Hue": 360,
+        "Saturation": 100
+    }
 }
 ```
 
-## infrared_device.py
+e.g., the _SET_ message that the '_Your AirConditioner_' HeaterCooler notifies the current temperature.
 
-### Configuration
+_Custom-Command_ **--[JSON message]-->** _RunnablePlatform_
+
+```json
+{
+    "method": "SET",
+    "name": "Your AirConditioner",
+    "characteristic": "CurrentTemperature",
+    "value": 20,
+}
+```
+
+## My Custom-Command, InfraredRunnable
+
+### Support Raspberry Pi HATs
+
+- [RPZ-IR-Sensor][RPZ-IR-Sensor] with '[cgir][cgir]' is a good product.
+- [ADRSIR][ADRSIR] with [adrsirlib][adrsirlib] has some problems that it fails to send an infrared code to the device on long distances.
+
+I strongly recommend [RPZ-IR-Sensor][RPZ-IR-Sensor] to send infrared codes because of my good experience.
+
+### Change Raspberry Pi HATs
 
 Change *SEND_INFRARED_COMMAND* variable to a command sending an infrared code.
 
-```python:infrared_device.py
-# The command of Infrared sending
+```python
+# the default is to use RPZ-IR-Sensor
 SEND_INFRARED_COMMAND: str = CGIRTOOL + " -c " + CGIRTOOL_CODE_JSON
 ```
 
-The command for RPZ-IR-Sensor is available to set *SEND_INFRARED_COMMAND*.
+RPZ-IR-Sensor is available on *SEND_INFRARED_COMMAND* default.
 
 |Recommend|Command|Description
 |:----------|:-----------|:------------
-|YES|CGIRTOOL|Send command that `cgirtool.py` contained in cgir with `send` followed.
-||IRCONTROL|Send command that `ircontrol` contained in adrsirlib with `send` followed.
+|YES|`CGIRTOOL`|Send command that `cgirtool.py` contained in 'cgir' with _send_ followed.
+||`IRCONTROL`|Send command that `ircontrol` contained in adrsirlib with _send_ followed.
 
-### Porting
+### Misc
 
-You must rewrite the implementation of the *__choose_infrared_code* function.
+InfraredRunnable involves some useful files:
 
-**Function Signature:**
+- *codes.json*  
+  involves some infrared codes of 'cgir.'
 
-```python:infrared_device.py
-    def __choose_infrared_code(self, interaction, level):
-        """ Choose the infrared code name to build a command line.
-        Args:
-            interaction: is an action of the infrared home device.
-                which is bound for the user interaction on Home app on iOS.
-                The first character of the name is LOWERCASE
-            level: is a level of the ``interaction`` parameter.
-        Returns:
-            str: The name of the infrared code.
-        """
+- *example.install_runnable.sh*  
+  installs InfraredRunnable on Ubuntu.  
+  Run the install script after changing masked as `XXX` to your sensitive information of the devices or some.
+
+Homebridge UI provides Swagger:
+
+- Swagger URL  
+  http:// [homebrdige domain or IP] /swagger
+
+- The cached accessories URL  
+  We get the current state of 'the cached accessories' on
+  http:// [homebrdige domain or IP] /swagger/static/index.html#/Homebridge/ServerController_getCachedAccessories
+
+### Ideas of RunnablePlatform feature
+
+I may or not add the RESTful API to RunnablePlatform.
+
+- RESTfulAPI  
+  - GET - get the state of RunnablePlatform accessory on the Homebridge.
+  - POST - notify the state to the Homebridge  
+    Memo: We already get 'the cached accessories' with Swagger on Homebridge.
+
+- Web socket  
+  RunnablePlatform sends the state to change by user interaction on Apple Home app or Siri.
+
+RunnablePlatform supports of updating the properties for some characteristics in  future.
+
+```json
+{
+"method": "PROPERTY",
+"name": "My Temperature",
+"characteristic": "TargetTemperature",
+"properties": [
+    "minValue": "18",
+    "maxValue": "30",
+    "minStep": "1"
+]
+}
 ```
-
-### Implementation
-
-You should implement the following behavior for your preference and environment:
-
-1. You can get the current state of the infrared home device by calling the *self.__device.get_value()* method with interaction (same as the name of the attribute on *config.json*).
-
-1. Choose the infrared code with the parameters *self*, *interaction*, and *level*.
-
-1. Return the infrared code.
-
-HomeRemote will send the infrared code and change the *interaction* state to the *level* level.
-
-*e.g.) __choose_infrared_aircon(self, interaction, level)* function:
-
-```python:infrared_device.py
-        LOGGER.debug(f"STR: {interaction}, {level}")
-
-        # The special code to fix a bug of Homebridge or CMD4.
-        # Not clear Homebridge passing the *CASE* of the names of the attributes and the values.
-        # I must compare the attribute on UPPERCASE.
-        interaction = interaction.upper()
-
-        if interaction != "ACTIVE" and interaction != "TARGETHEATERCOOLERSTATE":
-            return
-
-        infrared_aircon = None
-        active: str
-        heater_cooler_state: str
-
-        # Get the value of the 'on' and the 'brightness' attributes
-        if interaction == "ACTIVE":
-            active = level
-            heater_cooler_state = self.__device.get_value("targetHeaterCoolerState")
-        elif interaction == "TARGETHEATERCOOLERSTATE":
-            active = self.__device.get_value("active")
-            heater_cooler_state = level
-
-        # The special code to fix a bug of Homebridge or CMD4.
-        # Not clear Homebridge passing the *CASE* of the names of the attributes and the values.
-        # I must compare the attribute on UPPERCASE.
-        active = active.upper()
-        heater_cooler_state = heater_cooler_state.upper()
-
-        # INACTIVE
-        if active == "INACTIVE":
-            infrared_aircon = "aircon_off"
-        # ACTIVE
-        elif active == "ACTIVE":
-            # AUTO, if INACTIVE or IDLE comes, perhaps Homebridge or CMD4 have some bugs.
-            if heater_cooler_state == "AUTO":
-                infrared_aircon = "aircon_dehumidify-auto-auto"
-            # HEAT
-            elif heater_cooler_state == "HEAT":
-                infrared_aircon = "aircon_warm-22-auto"
-            # COOL
-            elif heater_cooler_state == "COOL":
-                infrared_aircon = "aircon_cool-26-auto"
-
-        LOGGER.debug(f"STR: {infrared_aircon}")
-        return infrared_aircon
-```
-
-## Misc
-
-I explain the useful files included in HomeRemote.
-
-- codes.json  
-  Some infrared codes of cgir.
-- example.install_homeremote.sh  
-  The install script contains that the replacement process of the sensitive information.  
-  Run the install script after changing sensitive information (as `XXX`) to your information of the devices.
 
 ## Thanks
 
 ### @IndoorCorgi
 
-@IndoorCorgi developed [RPZ-IR-Sensor][RPZ-IR-Sensor] and [cgir][cgir].
+@IndoorCorgi developed [RPZ-IR-Sensor][RPZ-IR-Sensor] and '[cgir][cgir].'
 
-They have done great work on hardware and software.
+They have done great work on hardware and good .
 
 [Their GitHub page is here.][cgir]
 
-### @ztalbot2000
-
-@ztalbot2000 provides us better homebridge plugin, Homebridges-cmd4.
-
-I hope that he provides documentations and examples of Homebridges-cmd4 more.
-
-[ztalbot2000's GitHub page is here.][Homebridges-cmd4]
-
 ## No Thanks
 
-[Bit Trade One, LTD.(ADRSIR design, manufacturing and sales)](https://bit-trade-one.co.jp) provides USELESS scripts and NO support.
+[Bit Trade One, LTD.](https://bit-trade-one.co.jp) (ADRSIR design, manufacturing, and sales) provides **NO** supports and the **USELESS** scripts. Bit Trade One is bad and poor from two facts.
 
 ## Environment
 
-HomeRemote is running but not limited with the following.
+RunnablePlatform is running as Homebridge Plugin.
+
+My Custom-Command, InfraredRunnable, is running but not limited:
 
 - Raspberry Pi OS: GNU/Linux 10 (buster) 10.11
 - Python: 3.7.3
-- cgir: trunk on main branch
-- HomeRemote: trunk on main branch
-- Node.js: 16.13.1
-- Homebridge: 1.3.9
-  - Homebridge UI: 4.41.5
-  - Homebridge Cmd4: 4.0.1
-  - Homebridge Hue: 0.13.32
-  - Homebridge Dyson Link: 2.5.6
+- cgir: trunk on the main branch

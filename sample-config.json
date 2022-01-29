@@ -1,0 +1,54 @@
+{
+    "bridge": {
+        "name": "Homebridge",
+        "username": "0E:00:78:24:5E:EB",
+        "port": 51888,
+        "pin": "856-12-657",
+        "advertiser": "avahi"
+    },
+    "accessories": [],
+    "platforms": [
+        {
+            "name": "Config",
+            "port": 8581,
+            "theme": "auto",
+            "tempUnits": "c",
+            "lang": "auto",
+            "platform": "config"
+        },
+        {
+            "platform": "RunnablePlatform",
+            "name": "RunnablePlatform",
+            "run": "< your custom command like ./runnable/runnable.py >",
+            "accessories": [
+                {
+                    "name": "Your Light",
+                    "service": "Lightbulb",
+                    "characteristics": [
+                        "On",
+                        "Brightness",
+                        "ColorTemperature",
+                        "Hue",
+                        "Saturation"
+                    ]
+                },
+                {
+                    "name": "Your AirConditioner",
+                    "service": "HeaterCooler",
+                    "characteristics": [
+                        "Active",
+                        "CurrentHeaterCoolerState",
+                        "TargetHeaterCoolerState",
+                        "CurrentTemperature",
+                        "LockPhysicalControls",
+                        "RotationSpeed",
+                        "SwingMode",
+                        "CoolingThresholdTemperature",
+                        "HeatingThresholdTemperature",
+                        "TemperatureDisplayUnits"
+                    ]
+                }
+            ]
+        }
+    ]
+}

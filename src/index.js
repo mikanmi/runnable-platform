@@ -1,3 +1,4 @@
+/* 
 Attribution-NonCommercial-NoDerivatives 4.0 International
 
 Copyright (c) 2022 Patineboot. All rights reserved.
@@ -25,3 +26,42 @@ No warranties are given. The license may not give you all of
 the permissions necessary for your intended use. For
 example, other rights such as publicity, privacy, or moral
 rights may limit how you use the material.
+*/
+
+"use strict";
+
+import { RunnablePlatform } from './RunnablePlatform.js';
+
+export const PLATFORM_NAME = 'RunnablePlatform';
+export const PLUGIN_NAME = 'homebridge-runnable-platform';
+
+/**
+ * @type {import("homebridge").Logger}
+ */
+export let LOG;
+/**
+ * @type {import("homebridge").API}
+ */
+export let HAPI;
+/**
+ * @type {import("homebridge").PlatformConfig}
+ */
+export let CONFIG;
+
+/**
+ * @param {import("homebridge").API} api
+ */
+export default function (api) {
+    api.registerPlatform(PLATFORM_NAME, RunnablePlatform);
+}
+
+/**
+ * @param {import("homebridge").Logger} log
+ * @param {import("homebridge").PlatformConfig} config
+ * @param {import("homebridge").API} api
+ */
+export function setHomebridge(log, config, api) {
+    LOG = log;
+    CONFIG = config;
+    HAPI = api;
+}

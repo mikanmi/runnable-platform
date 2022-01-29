@@ -1,0 +1,57 @@
+{
+  "pluginAlias": "RunnablePlatform",
+  "pluginType": "platform",
+  "singular": true,
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "title": "Name",
+        "type": "string",
+        "default": "RunnablePlatform"
+      },
+      "run": {
+        "title": "Run",
+        "description": "Input the absolute path of your custom-made-command to control your accessories",
+        "type": "string"
+      },
+      "time": {
+        "title": "Time (Millisecond)",
+        "description": "Input the millisecond time to finish handling a message on your custom-made-command",
+        "type": "integer"
+      },
+      "accessories": {
+        "type": "array",
+        "title": "Accessories",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "title": "Name",
+              "description": "Accessory Name"
+            },
+            "service": {
+              "type": "string",
+              "title": "Service Type",
+              "description": "Service Type Name"
+            },
+            "characteristics": {
+              "type": "array",
+              "title": "Characteristics",
+              "items": {
+                "type": "string",
+                "title": "Characteristic",
+                "description": "Characteristic Short Name"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          },
+          "required": [ "name", "service", "characteristics" ]
+        }
+      }
+    },
+    "required": [ "name", "run", "time", "accessories" ]
+  }
+}
