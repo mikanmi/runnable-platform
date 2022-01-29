@@ -234,3 +234,32 @@ My Custom-Command, InfraredRunnable, is running but not limited:
 - Raspberry Pi OS: GNU/Linux 10 (buster) 10.11
 - Python: 3.7.3
 - cgir: trunk on the main branch
+
+## Publish RunnablePlatform on NPM
+
+1. Login
+
+   ```bash
+   npm login
+   ```
+
+   npm asks
+
+   ```bash
+   Username: patine
+   Password: <your password>
+   Email: (this IS public) <your email address>
+   Enter one-time password: <one time password on received email>
+   ```
+
+1. Publish
+
+   ```bash
+   npm publish
+   ```
+
+1. Logout
+
+   ```bash
+   npm logout
+   ```
