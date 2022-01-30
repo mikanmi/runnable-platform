@@ -2,10 +2,9 @@
 
 [RPZ-IR-Sensor]: https://www.indoorcorgielec.com/products/rpz-ir-sensor/
 [IndoorCorgi]: https://github.com/IndoorCorgi
-[cgir]: https://github.com/IndoorCorgi/cgir
+[IndoorCorgi-cgir]: https://github.com/IndoorCorgi/cgir
 [ADRSIR]: https://bit-trade-one.co.jp/product/module/adrsir/
 [adrsirlib]: https://github.com/tokieng/adrsirlib
-[Homebridges-cmd4]: https://github.com/ztalbot2000/homebridge-cmd4
 [Homebridge-Service-Type]: https://developers.homebridge.io/#/service
 
 RunnablePlatform is a software program to provide connections using your Custom-Command command between infrared devices and Homebridge.
@@ -137,7 +136,7 @@ _Custom-Command_ **--[JSON message]-->** _RunnablePlatform_
     "method": "SET",
     "name": "Your AirConditioner",
     "characteristic": "CurrentTemperature",
-    "value": 20,
+    "value": 20
 }
 ```
 
@@ -145,7 +144,7 @@ _Custom-Command_ **--[JSON message]-->** _RunnablePlatform_
 
 ### Support Raspberry Pi HATs
 
-- [RPZ-IR-Sensor][RPZ-IR-Sensor] with '[cgir][cgir]' is a good product.
+- [RPZ-IR-Sensor][RPZ-IR-Sensor] with '[cgir][IndoorCorgi-cgir]' is a good product.
 - [ADRSIR][ADRSIR] with [adrsirlib][adrsirlib] has some problems that it fails to send an infrared code to the device on long distances.
 
 I strongly recommend [RPZ-IR-Sensor][RPZ-IR-Sensor] to send infrared codes because of my good experience.
@@ -163,7 +162,7 @@ RPZ-IR-Sensor is available on *SEND_INFRARED_COMMAND* default.
 
 |Recommend|Command|Description
 |:----------|:-----------|:------------
-|YES|`CGIRTOOL`|Send command that `cgirtool.py` contained in 'cgir' with _send_ followed.
+|YES|`CGIRTOOL`|Send command that `cgirtool.py` contained in '[cgir][IndoorCorgi-cgir]' with _send_ followed.
 ||`IRCONTROL`|Send command that `ircontrol` contained in adrsirlib with _send_ followed.
 
 ## Misc
@@ -171,7 +170,7 @@ RPZ-IR-Sensor is available on *SEND_INFRARED_COMMAND* default.
 InfraredRunnable involves some useful files:
 
 - *codes.json*  
-  involves some infrared codes of 'cgir.'
+  involves some infrared codes of '[cgir][IndoorCorgi-cgir].'
 
 - *example.install_runnable.sh*  
   installs InfraredRunnable on Ubuntu.  
@@ -217,9 +216,9 @@ RunnablePlatform supports of updating the properties for some characteristics in
 
 [@IndoorCorgi][IndoorCorgi]
 
-They created a nice Raspberry Pi HAT, [RPZ-IR-Sensor][RPZ-IR-Sensor], and a good tool, '[cgir][cgir].'
+They created a nice Raspberry Pi HAT, [RPZ-IR-Sensor][RPZ-IR-Sensor], and a good tool, '[cgir][IndoorCorgi-cgir].'
 
-[@IndoorCorgi][IndoorCorgi]'s '[cgir][cgir]': <https://github.com/IndoorCorgi/cgir>
+[@IndoorCorgi][IndoorCorgi]'s '[cgir][IndoorCorgi-cgir]': <https://github.com/IndoorCorgi/cgir>
 
 ## No Thanks
 
@@ -233,7 +232,7 @@ My Custom-Command, InfraredRunnable, is running but not limited:
 
 - Raspberry Pi OS: GNU/Linux 10 (buster) 10.11
 - Python: 3.7.3
-- cgir: trunk on the main branch
+- [cgir][IndoorCorgi-cgir]: trunk on the main branch
 
 ## Publish RunnablePlatform on NPM
 
