@@ -71,15 +71,7 @@ class Runnable:
     def run(self):
         LOGGER.debug(f"STR")
 
-        def loop():
-            LOGGER.debug(f"STR")
-            for line in sys.stdin:
-                LOGGER.info(f"received: {line.strip()}")
-                message = json.loads(line)
-                self.send(message)
-            LOGGER.debug(f"END")
-
-        thread = Thread(target=loop)
+        thread = Thread(target=self.__loop)
         thread.start()
 
         # wait for closing stdin
@@ -87,7 +79,15 @@ class Runnable:
 
         LOGGER.debug(f"END")
 
-    def send(self, message):
+    def __loop(self):
+        LOGGER.debug(f"STR")
+        for line in sys.stdin:
+            LOGGER.info(f"received: {line.strip()}")
+            message = json.loads(line)
+            self.__send(message)
+        LOGGER.debug(f"END")
+
+    def __send(self, message):
         text = json.dumps(message)
         LOGGER.info(f"send: {text}")
         sys.stdout.write(text + "\n")

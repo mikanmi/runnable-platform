@@ -31,34 +31,13 @@
 # Python 3.8 or later supports the Final feature
 # from typing import Final
 
-import os
 import sys
-import subprocess
 import json
 
 from threading import Thread
+from threading import Lock
 
-######################
-#      Configure     #
-######################
-# The infrared HAT tools and commands.
-# CGIRTOOL: Final[str] = "/var/opt/cgir/cgirtool.py send"
-# IRCONTROL: Final[str] = "/var/opt/adrsirlib/ircontrol send"
-CGIRTOOL = "/var/opt/cgir/cgirtool.py send"
-IRCONTROL = "/var/opt/adrsirlib/ircontrol send"
-
-
-# CGIRTOOL configure
-# the directory which contains infraredRunnable.py.
-# SCRIPT_DIRECTORY: Final[str] = os.path.dirname(__file__)
-# infrared codes json file.
-# CGIRTOOL_CODE_JSON: Final[str] = os.path.join(SCRIPT_DIRECTORY, "codes.json")
-# The command of Infrared sending
-# SEND_INFRARED_COMMAND: str = CGIRTOOL + " -c " + CGIRTOOL_CODE_JSON
-
-SCRIPT_DIRECTORY = os.path.dirname(__file__)
-CGIRTOOL_CODE_JSON = os.path.join(SCRIPT_DIRECTORY, "codes.json")
-SEND_INFRARED_COMMAND = CGIRTOOL + " -c " + CGIRTOOL_CODE_JSON
+from rpzirsensor import RpzIrSensor
 
 ######################
 #    Script Code     #
@@ -85,26 +64,29 @@ class InfraredRunnable:
 
         LOGGER.debug(f"STR")
 
-        self.__dryrun = dryrun
+        self.__lock = Lock()
+        self.__ir_sensor = RpzIrSensor(logger, dryrun, self)
 
         LOGGER.debug(f"END")
 
     def run(self):
         LOGGER.debug(f"STR")
 
-        def loop():
-            LOGGER.debug(f"STR")
-            for line in sys.stdin:
-                LOGGER.info(f"received: {line.strip()}")
-                self.__handle(line)
-            LOGGER.debug(f"END")
-
-        thread = Thread(target=loop)
+        thread = Thread(target=self.__loop)
         thread.start()
+        self.__ir_sensor.start()
 
         # wait for closing stdin
         thread.join()
 
+        LOGGER.debug(f"END")
+
+    def __loop(self):
+        LOGGER.debug(f"STR")
+
+        for line in sys.stdin:
+            LOGGER.info(f"received: {line.strip()}")
+            self.__handle(line)
         LOGGER.debug(f"END")
 
     def __handle(self, line):
@@ -124,7 +106,7 @@ class InfraredRunnable:
         ]
 
         humidifierdehumidifier_name = [
-            "SIRENE",
+            "Sirene",
         ]
 
         device_name = message["name"]
@@ -148,7 +130,7 @@ class InfraredRunnable:
         state[message["characteristic"]] = message["value"]
 
         infrared = self.__select_lightbulb_code(state, prefix)
-        self.__flash(infrared)
+        self.__ir_sensor.flash(infrared)
 
     def __select_lightbulb_code(self, state, prefix):
         LOGGER.debug(f"STR: {state} {prefix}")
@@ -194,7 +176,7 @@ class InfraredRunnable:
         state[message["characteristic"]] = message["value"]
 
         infrared, current_state, temperature = self.__select_airconditioner_code(state)
-        self.__flash(infrared)
+        self.__ir_sensor.flash(infrared)
 
         # make the message to send the device status from the receive message
         # update the status in the message
@@ -267,11 +249,11 @@ class InfraredRunnable:
         }
         state[message["characteristic"]] = message["value"]
 
-        infrareds, current_state, current_humidity = \
+        infrareds, current_state = \
             self.__select_humidifierdehumidifier_code(state, active_status)
 
         for infrared in infrareds:
-            self.__flash(infrared)
+            self.__ir_sensor.flash(infrared)
 
         # make the message to send the device status from the receive message
         # update the status in the message
@@ -281,86 +263,62 @@ class InfraredRunnable:
         message["value"] = current_state
         self.send(message)
 
-        # update the status in the message
-        message["status"][message["characteristic"]] = message["value"]
-        # send CurrentRelativeHumidity
-        message["characteristic"] = "CurrentRelativeHumidity"
-        message["value"] = current_humidity
-        self.send(message)
-
     def __select_humidifierdehumidifier_code(self, state, active_status):
-        LOGGER.debug(f"STR: {state}")
+        LOGGER.debug(f"STR: {state}, {active_status}")
 
         # select an infrared code with the 'Active' and 'TargetHumidifierDehumidifierState' attributes.
         selected_code = []
         current_state = 0
-        current_humidity = 0
 
         active = state["Active"]
         target_humidifier_dehumidifier_state = state["TargetHumidifierDehumidifierState"]
         relative_humidity_humidifier_threshold = state["RelativeHumidityHumidifierThreshold"]
 
-        # toggle the power switch
+        # change the power switch to ON or OFF
         if active != active_status:
-            selected_code.append("sirene_off")
+            selected_code.append("sirene_on-off")
             current_state = active  # ACTIVE or INACTIVE
-            current_humidity = 0
 
-        # the 'Active' element is 'ACTIVE'
-        if active == 1:
-            # AUTO or HUMIDIFIER_OR_DEHUMIDIFIER
-            if target_humidifier_dehumidifier_state == 0:
-                selected_code.append("sirene_auto")
-                current_state = 2  # HUMIDIFYING
-                current_humidity = 0
-            # HUMIDIFIER
-            elif target_humidifier_dehumidifier_state == 1:
-                current_state = 2  # HUMIDIFYING
-                current_humidity = 0
-                if relative_humidity_humidifier_threshold < 34:
-                    selected_code.append("sirene_minus")
-                    selected_code.append("sirene_minus")
-                elif relative_humidity_humidifier_threshold < 67:
-                    selected_code.append("sirene_minus")
-                    selected_code.append("sirene_minus")
-                    selected_code.append("sirene_plus")
-                else:
-                    selected_code.append("sirene_plus")
-                    selected_code.append("sirene_plus")
-            # DEHUMIDIFIER
-            elif target_humidifier_dehumidifier_state == 2:
-                # nothing to do
-                LOGGER.warn(f"SIRENE does not have the DEHUMIDIFIER feature")
+            LOGGER.debug(f"END: {selected_code}, {current_state}")
+            return selected_code, current_state
 
-        LOGGER.debug(f"END: {selected_code}, {current_state}, {current_humidity}")
-        return selected_code, current_state, current_humidity
+        # the 'Active' element is 'INACTIVE'
+        if active == 0:
+            LOGGER.debug(f"END: {selected_code}, {current_state}")
+            return selected_code, current_state
 
-    def __flash(self, infrared_code):
-        LOGGER.debug(f"STR: {infrared_code}")
+        # AUTO or HUMIDIFIER_OR_DEHUMIDIFIER
+        if target_humidifier_dehumidifier_state == 0:
+            selected_code.append("sirene_auto")
+            current_state = 2  # HUMIDIFYING
+        # HUMIDIFIER
+        elif target_humidifier_dehumidifier_state == 1:
+            current_state = 2  # HUMIDIFYING
+            if relative_humidity_humidifier_threshold < 34:
+                selected_code.append("sirene_minus")
+                selected_code.append("sirene_minus")
+            elif relative_humidity_humidifier_threshold < 67:
+                selected_code.append("sirene_minus")
+                selected_code.append("sirene_minus")
+                selected_code.append("sirene_plus")
+            else:
+                selected_code.append("sirene_plus")
+                selected_code.append("sirene_plus")
+        # DEHUMIDIFIER
+        elif target_humidifier_dehumidifier_state == 2:
+            # nothing to do
+            LOGGER.warn(f"Sirene does not have the DEHUMIDIFIER feature")
 
-        if infrared_code is None:
-            LOGGER.warn(f"Not found any infrared codes")
-
-        send_command_line = f"{SEND_INFRARED_COMMAND} {infrared_code}"
-        LOGGER.info(f"Infrared: {send_command_line}")
-        if self.__dryrun:
-            return
-
-        send_command = send_command_line.split()
-        process = subprocess.run(send_command, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        if process.returncode != 0:
-            LOGGER.error(f"command line: {send_command}")
-            LOGGER.error(f"error code: {process.returncode}")
-            LOGGER.error(f"error message: {process.stdout}")
-            process.check_returncode()
-
-        LOGGER.debug(f"END")
+        LOGGER.debug(f"END: {selected_code}, {current_state}")
+        return selected_code, current_state
 
     def send(self, message):
+        self.__lock.acquire()
         text = json.dumps(message)
         LOGGER.info(f"send: {text}")
         sys.stdout.write(text + "\n")
         sys.stdout.flush()
+        self.__lock.release()
 
 
 if __name__ == "__main__":

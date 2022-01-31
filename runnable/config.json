@@ -22,7 +22,7 @@
         {
             "platform": "RunnablePlatform",
             "name": "RunnablePlatform",
-            "run": "/var/opt/infrared-runnable/runnable.py",
+            "run": "/var/opt/infrared-runnable/runnable.py -v",
             "time": 300,
             "accessories": [
                 {
@@ -53,7 +53,7 @@
                     ]
                 },
                 {
-                    "name": "SIRENE",
+                    "name": "Sirene",
                     "service": "HumidifierDehumidifier",
                     "characteristics": [
                         "Active",
@@ -61,6 +61,20 @@
                         "TargetHumidifierDehumidifierState",
                         "CurrentRelativeHumidity",
                         "RelativeHumidityHumidifierThreshold"
+                    ]
+                },
+                {
+                    "name": "Aya Humidity",
+                    "service": "HumiditySensor",
+                    "characteristics": [
+                        "CurrentRelativeHumidity"
+                    ]
+                },
+                {
+                    "name": "Aya Temperature",
+                    "service": "TemperatureSensor",
+                    "characteristics": [
+                        "CurrentTemperature"
                     ]
                 }
             ]
