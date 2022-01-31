@@ -51,6 +51,17 @@
                         "CurrentTemperature",
                         "HeatingThresholdTemperature"
                     ]
+                },
+                {
+                    "name": "SIRENE",
+                    "service": "HumidifierDehumidifier",
+                    "characteristics": [
+                        "Active",
+                        "CurrentHumidifierDehumidifierState",
+                        "TargetHumidifierDehumidifierState",
+                        "CurrentRelativeHumidity",
+                        "RelativeHumidityHumidifierThreshold"
+                    ]
                 }
             ]
         },

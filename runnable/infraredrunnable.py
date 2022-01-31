@@ -96,7 +96,7 @@ class InfraredRunnable:
             LOGGER.debug(f"STR")
             for line in sys.stdin:
                 LOGGER.info(f"received: {line.strip()}")
-                self.handle(line)
+                self.__handle(line)
             LOGGER.debug(f"END")
 
         thread = Thread(target=loop)
@@ -107,7 +107,7 @@ class InfraredRunnable:
 
         LOGGER.debug(f"END")
 
-    def handle(self, line):
+    def __handle(self, line):
         message = json.loads(line)
 
         if message["method"] != "SET":
@@ -123,13 +123,21 @@ class InfraredRunnable:
             "AirConditioner",
         ]
 
+        humidifierdehumidifier_name = [
+            "SIRENE",
+        ]
+
         device_name = message["name"]
         if device_name in lightbulb_name:
-            self.handle_lightbulb(message, lightbulb_name)
+            self.__handle_lightbulb(message, lightbulb_name)
         elif device_name in heatercooler_name:
-            self.handle_heatercooler(message)
+            self.__handle_heatercooler(message)
+        elif device_name in humidifierdehumidifier_name:
+            self.__handle_humidifierdehumidifier(message)
 
-    def handle_lightbulb(self, message, lightbulb_name):
+    def __handle_lightbulb(self, message, lightbulb_name):
+        LOGGER.debug(f"STR: {message}, {lightbulb_name}")
+
         prefix = lightbulb_name[message["name"]]
 
         # chaneg the device state to the status.
@@ -141,36 +149,6 @@ class InfraredRunnable:
 
         infrared = self.__select_lightbulb_code(state, prefix)
         self.__flash(infrared)
-
-    def handle_heatercooler(self, message):
-        # chaneg the device state to the status.
-        state = {
-            "Active": message["status"]["Active"],
-            # "CurrentHeaterCoolerState": message["status"]["CurrentHeaterCoolerState"],
-            "TargetHeaterCoolerState": message["status"]["TargetHeaterCoolerState"],
-            # "CurrentTemperature": message["status"]["CurrentTemperature"],
-
-            "HeatingThresholdTemperature": message["status"]["HeatingThresholdTemperature"],
-        }
-        state[message["characteristic"]] = message["value"]
-
-        infrared, current_state, temperature = self.__select_airconditioner_code(state)
-        self.__flash(infrared)
-
-        # make the message to send the device status from the receive message
-        # update the status in the message
-        message["status"][message["characteristic"]] = message["value"]
-        # send CurrentHeaterCoolerState due to changing TargetHeaterCoolerState
-        message["characteristic"] = "CurrentHeaterCoolerState"
-        message["value"] = current_state
-        self.send(message)
-
-        # update the status in the message
-        message["status"][message["characteristic"]] = message["value"]
-        # send CurrentTemperature due to changing TargetHeaterCoolerState
-        message["characteristic"] = "CurrentTemperature"
-        message["value"] = temperature
-        self.send(message)
 
     def __select_lightbulb_code(self, state, prefix):
         LOGGER.debug(f"STR: {state} {prefix}")
@@ -201,10 +179,43 @@ class InfraredRunnable:
 
         return selected_code
 
+    def __handle_heatercooler(self, message):
+        LOGGER.debug(f"STR: {message}")
+
+        # chaneg the device state to the status.
+        state = {
+            "Active": message["status"]["Active"],
+            # "CurrentHeaterCoolerState": message["status"]["CurrentHeaterCoolerState"],
+            "TargetHeaterCoolerState": message["status"]["TargetHeaterCoolerState"],
+            # "CurrentTemperature": message["status"]["CurrentTemperature"],
+
+            "HeatingThresholdTemperature": message["status"]["HeatingThresholdTemperature"],
+        }
+        state[message["characteristic"]] = message["value"]
+
+        infrared, current_state, temperature = self.__select_airconditioner_code(state)
+        self.__flash(infrared)
+
+        # make the message to send the device status from the receive message
+        # update the status in the message
+        message["status"][message["characteristic"]] = message["value"]
+        # send CurrentHeaterCoolerState due to changing TargetHeaterCoolerState
+        message["characteristic"] = "CurrentHeaterCoolerState"
+        message["value"] = current_state
+        self.send(message)
+
+        # update the status in the message
+        message["status"][message["characteristic"]] = message["value"]
+        # send CurrentTemperature due to changing TargetHeaterCoolerState
+        message["characteristic"] = "CurrentTemperature"
+        message["value"] = temperature
+        self.send(message)
+
     def __select_airconditioner_code(self, state):
         LOGGER.debug(f"STR: {state}")
 
-        # select an infrared code with the 'Active' and 'TargetHeaterCoolerState' attributes.
+        # select an infrared code with
+        # the 'Active' and 'TargetHeaterCoolerState' and HeatingThresholdTemperature attributes.
         selected_code = None
         temperature = 0
         current_state = 0
@@ -242,6 +253,87 @@ class InfraredRunnable:
 
         LOGGER.debug(f"END: {selected_code}, {current_state}, {temperature}")
         return selected_code, current_state, temperature
+
+    def __handle_humidifierdehumidifier(self, message):
+        LOGGER.debug(f"STR: {message}")
+
+        active_status = message["status"]["Active"]
+
+        # chaneg the device state to the status.
+        state = {
+            "Active": message["status"]["Active"],
+            "TargetHumidifierDehumidifierState": message["status"]["TargetHumidifierDehumidifierState"],
+            "RelativeHumidityHumidifierThreshold": message["status"]["RelativeHumidityHumidifierThreshold"],
+        }
+        state[message["characteristic"]] = message["value"]
+
+        infrareds, current_state, current_humidity = \
+            self.__select_humidifierdehumidifier_code(state, active_status)
+
+        for infrared in infrareds:
+            self.__flash(infrared)
+
+        # make the message to send the device status from the receive message
+        # update the status in the message
+        message["status"][message["characteristic"]] = message["value"]
+        # send CurrentHumidifierDehumidifierState due to TargetHumidifierDehumidifierState
+        message["characteristic"] = "CurrentHumidifierDehumidifierState"
+        message["value"] = current_state
+        self.send(message)
+
+        # update the status in the message
+        message["status"][message["characteristic"]] = message["value"]
+        # send CurrentRelativeHumidity
+        message["characteristic"] = "CurrentRelativeHumidity"
+        message["value"] = current_humidity
+        self.send(message)
+
+    def __select_humidifierdehumidifier_code(self, state, active_status):
+        LOGGER.debug(f"STR: {state}")
+
+        # select an infrared code with the 'Active' and 'TargetHumidifierDehumidifierState' attributes.
+        selected_code = []
+        current_state = 0
+        current_humidity = 0
+
+        active = state["Active"]
+        target_humidifier_dehumidifier_state = state["TargetHumidifierDehumidifierState"]
+        relative_humidity_humidifier_threshold = state["RelativeHumidityHumidifierThreshold"]
+
+        # toggle the power switch
+        if active != active_status:
+            selected_code.append("sirene_off")
+            current_state = active  # ACTIVE or INACTIVE
+            current_humidity = 0
+
+        # the 'Active' element is 'ACTIVE'
+        if active == 1:
+            # AUTO or HUMIDIFIER_OR_DEHUMIDIFIER
+            if target_humidifier_dehumidifier_state == 0:
+                selected_code.append("sirene_auto")
+                current_state = 2  # HUMIDIFYING
+                current_humidity = 0
+            # HUMIDIFIER
+            elif target_humidifier_dehumidifier_state == 1:
+                current_state = 2  # HUMIDIFYING
+                current_humidity = 0
+                if relative_humidity_humidifier_threshold < 34:
+                    selected_code.append("sirene_minus")
+                    selected_code.append("sirene_minus")
+                elif relative_humidity_humidifier_threshold < 67:
+                    selected_code.append("sirene_minus")
+                    selected_code.append("sirene_minus")
+                    selected_code.append("sirene_plus")
+                else:
+                    selected_code.append("sirene_plus")
+                    selected_code.append("sirene_plus")
+            # DEHUMIDIFIER
+            elif target_humidifier_dehumidifier_state == 2:
+                # nothing to do
+                LOGGER.warn(f"SIRENE does not have the DEHUMIDIFIER feature")
+
+        LOGGER.debug(f"END: {selected_code}, {current_state}, {current_humidity}")
+        return selected_code, current_state, current_humidity
 
     def __flash(self, infrared_code):
         LOGGER.debug(f"STR: {infrared_code}")
