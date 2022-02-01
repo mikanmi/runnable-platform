@@ -1,6 +1,6 @@
 {
     "bridge": {
-        "name": "Mayu",
+        "name": "Aya",
         "username": "0E:26:1F:4A:39:CB",
         "manufacturer": "Patineboot",
         "model": "homebridge",
@@ -22,7 +22,7 @@
         {
             "platform": "RunnablePlatform",
             "name": "RunnablePlatform",
-            "run": "/var/opt/infrared-runnable/runnable.py -v",
+            "run": "/var/opt/infrared-runnable/runnable.py",
             "time": 300,
             "accessories": [
                 {
