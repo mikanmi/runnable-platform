@@ -3,13 +3,16 @@
 [RPZ-IR-Sensor]: https://www.indoorcorgielec.com/products/rpz-ir-sensor/
 [IndoorCorgi]: https://github.com/IndoorCorgi
 [IndoorCorgi-cgir]: https://github.com/IndoorCorgi/cgir
+[IndoorCorgi-cgsensor]: https://github.com/IndoorCorgi/cgsensor
 [ADRSIR]: https://bit-trade-one.co.jp/product/module/adrsir/
 [adrsirlib]: https://github.com/tokieng/adrsirlib
 [Homebridge-Service-Type]: https://developers.homebridge.io/#/service
 
-RunnablePlatform is a software program to provide connections using your Custom-Command command between infrared devices and Homebridge.
+RunnablePlatform is the Homebridge plugin that connects many infrared home devices with Homebridge using Custom-Command.
 
-My Custom-Command, InfraredRunnable, sends infrared codes to connect two LightBulb devices and a HeaterCooler device with the Homebridge service.
+RunnablePlatform and Custom-Command communicate through Custom-Command’s standard input and output with each other.
+
+My Custom-Command, InfraredRunnable, controls some infrared home devices.
 
 You can enjoy controlling your infrared home devices, a ceiling light, an air conditioner, or more joyful devices on Apple Home app on iPhone or Siri, using RunnablePlatform and your Custom-Command.
 
@@ -23,19 +26,19 @@ RunnablePlatform supports:
 - All [Service Types][Homebridge-Service-Type] of Homebridge.
 - All Characteristics of [Service Types][Homebridge-Service-Type] on Homebridge.
 
-e.g., LightBulb, Heater Cooler, Humidifier Dehumidifier, Humidity Sensor, Light Sensor, Temperature Sensor, or all sort of [Homebridge API Service Types][Homebridge-Service-Type] with all Characteristics.
+e.g., My Custom-Command, InfraredRunnable, support LightBulb, Heater Cooler, Humidifier Dehumidifier, Humidity Sensor, Light Sensor, Temperature Sensor. You can create a Custom-Command supports all sorts of [Homebridge API Service Types][Homebridge-Service-Type] with all Characteristics.
 
 ## Install
 
-Search patineboot's RunnablePlatform with the 'Homebridge RunnablePlatform' words on npm or Homebridge.
+Search **patineboot's** RunnablePlatform with the "RunnablePlatform" word on Homebridge.
 
-Install RunnablePlatform you found on npm or Homebridge.
+Install RunnablePlatform you found on Homebridge.
 
 ## Usage
 
 ### Config the config.json file of Homebridge
 
-The example of a part of RunnablePlatform on config.json.
+The example of the element of RunnablePlatform on config.json.
 
 ```bash
 {
@@ -61,9 +64,9 @@ The RunnablePlatform platform element.
 |-|-|-|
 |platform|string|Set "_RunnablePlatform_" only.|
 |name|string|Set "_RunnablePlatform_" only.|
-|run|string|Input the absolute path of your Custom-Command to control the accessories.|
-|time|number|Input the millisecond time to finish handling a message on the Custom-Command.|
-|accessories|array of any type|See the following:|
+|run|string|Input the absolute path of the Custom-Command to control the infrared home devices.|
+|time|number|Input the millisecond time to finish handling a JSON message on the Custom-Command.|
+|accessories|array of any type|See the following accessories element of RunnablePlatform|
 
 The accessories element of RunnablePlatform.
 |Attribute|Type|Description|
@@ -94,24 +97,25 @@ Get service and characteristics, e.g., Heater Cooler:
 
 ## Program the Custom-Command
 
-RunnablePlatform communicates with Custom-Command through the standard input and output.
+RunnablePlatform and Custom-Command communicate through Custom-Command’s standard input and output with each other.
 
-Custom-Command has the features:
+Custom-Command should have the two features:
 
-- Send an infrared code to your infrared home device
-- Communicate the JSON messages to RunnablePlatform.
+- Send infrared codes to infrared home devices
+- Post and Receive a JSON message to RunnablePlatform
 
-The JSON message format:
+The JSON message format on the standard input and output:
 |Attribute|Type|Description|
 |-|-|-|
 |method|string|Set '_SET_' only.|
-|name|string|The name which you describe your infrared home device on _config.json_.|
-|characteristic|string|The request that the receiver changes the characteristic.|
-|value|string|The changed value of the characteristic.|
-|status|array of any|The current characteristics of your infrared home device.|
+|name|string|The name of your infrared home device .|
+|characteristic|string|The characteristic will change the new value.|
+|value|string|The new value of the characteristic.|
+|status|array of any|The current characteristics of the device specified with name attribute.|
 
-e.g., the _SET_ message that RunnablePlatform turns on the '_Your Light_' Lightbulb.
+e.g., the JSON message that RunnablePlatform turns on the '_Your Light_' Lightbulb.
 
+_Custom-Command_'s standard input:  
 _RunnablePlatform_ **--[JSON message]->** _Custom-Command_
 
 ```json
@@ -130,8 +134,9 @@ _RunnablePlatform_ **--[JSON message]->** _Custom-Command_
 }
 ```
 
-e.g., the _SET_ message that the '_Your AirConditioner_' HeaterCooler notifies the current temperature.
+e.g., the JSON message that the '_Your AirConditioner_' HeaterCooler notifies the current temperature.
 
+_Custom-Command_'s standard output:  
 _Custom-Command_ **--[JSON message]-->** _RunnablePlatform_
 
 ```json
@@ -145,28 +150,23 @@ _Custom-Command_ **--[JSON message]-->** _RunnablePlatform_
 
 ## My Custom-Command, InfraredRunnable
 
-### Support Raspberry Pi HATs
+My Custom-Command, InfraredRunnable, sends some infrared codes registered previous to my infrared home devices with [RPZ-IR-Sensor][RPZ-IR-Sensor].
 
-- [RPZ-IR-Sensor][RPZ-IR-Sensor] with '[cgir][IndoorCorgi-cgir]' is a good product.
-- [ADRSIR][ADRSIR] with [adrsirlib][adrsirlib] has some problems that it fails to send an infrared code to the device on long distances.
+InfraredRunnable uses hardware and software:
 
-I strongly recommend [RPZ-IR-Sensor][RPZ-IR-Sensor] to send infrared codes because of my good experience.
+- [RPZ-IR-Sensor][RPZ-IR-Sensor]: is an infrared sender of the Raspberry Pi HAT.
+- [cgir][IndoorCorgi-cgir]: is a tool in Python to control RPZ-IR-Sensor.
+- [cgsensor][IndoorCorgi-cgsensor]: is a tool to get the sensor data from RPZ-IR-Sensor.
 
-### Change Raspberry Pi HATs
+My list of infrared home devices:
 
-Change *SEND_INFRARED_COMMAND* variable to a command sending an infrared code.
-
-```python
-# the default is to use RPZ-IR-Sensor
-SEND_INFRARED_COMMAND: str = CGIRTOOL + " -c " + CGIRTOOL_CODE_JSON
-```
-
-RPZ-IR-Sensor is available on *SEND_INFRARED_COMMAND* default.
-
-|Recommend|Command|Description
-|:----------|:-----------|:------------
-|YES|`CGIRTOOL`|Send command that `cgirtool.py` contained in '[cgir][IndoorCorgi-cgir]' with _send_ followed.
-||`IRCONTROL`|Send command that `ircontrol` contained in adrsirlib with _send_ followed.
+|Product Name|Constructor|Service Type|
+|-|-|-|
+|RPZ-IR-Sensor|Indoor Corgi|HumiditySensor and TemperatureSensor|
+|Serene|Francfranc|HumidifierDehumidifier|
+|A ceiling light|Panasonic|LightBulb|
+|A ceiling light|Panasonic|LightBulb|
+|An air-conditioner|N/A|HeaterCooler|
 
 ## Misc
 
@@ -176,7 +176,7 @@ InfraredRunnable involves some useful files:
   involves some infrared codes of '[cgir][IndoorCorgi-cgir].'
 
 - *example.install_runnable.sh*  
-  installs InfraredRunnable on Ubuntu.  
+  installs InfraredRunnable on Ubuntu Linux.  
   Run the install script after changing masked as `XXX` to your sensitive information of the devices or some.
 
 Homebridge UI provides Swagger:
@@ -188,44 +188,29 @@ Homebridge UI provides Swagger:
   We get the current state of 'the cached accessories' on  
   http:// [homebrdige domain or IP] /swagger/static/index.html#/Homebridge/ServerController_getCachedAccessories
 
-### Ideas of RunnablePlatform feature
+### Patineboot's ideas about RunnablePlatform
 
-I may or not add the RESTful API to RunnablePlatform.
+1. I may add the new communication to RunnablePlatform.
+   - RESTful API  
+     - GET - get the state of RunnablePlatform accessory on the Homebridge.
+     - POST - notify the state to the Homebridge  
+       Memo: We already get 'the cached accessories' with Swagger on Homebridge.
+   - Web socket  
+     RunnablePlatform sends the state to change by user interaction on Apple Home app or Siri.
+1. RunnablePlatform supports of updating the properties for some characteristics in  future.
 
-- RESTfulAPI  
-  - GET - get the state of RunnablePlatform accessory on the Homebridge.
-  - POST - notify the state to the Homebridge  
-    Memo: We already get 'the cached accessories' with Swagger on Homebridge.
-
-- Web socket  
-  RunnablePlatform sends the state to change by user interaction on Apple Home app or Siri.
-
-RunnablePlatform supports of updating the properties for some characteristics in  future.
-
-```json
-{
-"method": "PROPERTY",
-"name": "My Temperature",
-"characteristic": "TargetTemperature",
-"properties": [
-    "minValue": "18",
-    "maxValue": "30",
-    "minStep": "1"
-]
-}
-```
-
-## Thanks
-
-[@IndoorCorgi][IndoorCorgi]
-
-They created a nice Raspberry Pi HAT, [RPZ-IR-Sensor][RPZ-IR-Sensor], and a good tool, '[cgir][IndoorCorgi-cgir].'
-
-[@IndoorCorgi][IndoorCorgi]'s '[cgir][IndoorCorgi-cgir]': <https://github.com/IndoorCorgi/cgir>
-
-## No Thanks
-
-[Bit Trade One, LTD.](https://bit-trade-one.co.jp) (ADRSIR design, manufacturing, and sales) provides **NO** supports and the **USELESS** scripts. Bit Trade One is bad and poor from two facts.
+   ```json
+   {
+       "method": "PROPERTY",
+       "name": "My Temperature",
+       "characteristic": "TargetTemperature",
+       "properties": [
+           "minValue": "18",
+           "maxValue": "30",
+           "minStep": "1"
+       ]
+   }
+   ```
 
 ## Environment
 
@@ -235,9 +220,29 @@ My Custom-Command, InfraredRunnable, is running but not limited:
 
 - Raspberry Pi OS: GNU/Linux 10 (buster) 10.11
 - Python: 3.7.3
-- [cgir][IndoorCorgi-cgir]: trunk on the main branch
+- [cgir][IndoorCorgi-cgir]: 1.0
+- [cgsensor][IndoorCorgi-cgsensor]: 1.0
 
-## Publish RunnablePlatform on NPM
+## Thanks
+
+@[IndoorCorgi][IndoorCorgi]
+
+They created a nice Raspberry Pi HAT, [RPZ-IR-Sensor][RPZ-IR-Sensor], and good tools, '[cgir][IndoorCorgi-cgir] and [cgsensor][IndoorCorgi-cgsensor].'
+
+@[IndoorCorgi][IndoorCorgi]'s '[RPZ-IR-Sensor][RPZ-IR-Sensor]': <https://www.indoorcorgielec.com/products/rpz-ir-sensor/>
+
+I strongly recommend [RPZ-IR-Sensor][RPZ-IR-Sensor] to send infrared codes because of my good experience.
+
+## No Thanks
+
+[Bit Trade One, LTD.](https://bit-trade-one.co.jp) (ADRSIR design, manufacturing, and sales) provides **NO** supports and the **USELESS** scripts. Bit Trade One provides bad and poor deliverables.
+
+@[ztalbot2000](https://github.com/ztalbot2000)
+
+He has released [Homebridge CMD4](https://github.com/ztalbot2000/homebridge-cmd4) involving  non-compatible changes frequently.  
+I am tired of updating my command to only fit his CMD4 anymore.
+
+## Publish RunnablePlatform on NPM for patine
 
 1. Login
 

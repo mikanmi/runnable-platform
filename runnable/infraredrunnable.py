@@ -121,14 +121,13 @@ class InfraredRunnable:
         LOGGER.debug(f"STR: {message}, {lightbulb_name}")
 
         prefix = lightbulb_name[message["name"]]
-
-        # chaneg the device state to the status.
         state = {
             "On": message["status"]["On"],
             "Brightness": message["status"]["Brightness"],
         }
         state[message["characteristic"]] = message["value"]
 
+        # change the device state to the status.
         infrared = self.__select_lightbulb_code(state, prefix)
         self.__ir_sensor.flash(infrared)
 
