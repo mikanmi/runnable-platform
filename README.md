@@ -16,6 +16,8 @@ My Custom-Command, InfraredRunnable, controls some infrared home devices.
 
 You can enjoy controlling your infrared home devices, a ceiling light, an air conditioner, or more joyful devices on Apple Home app on iPhone or Siri, using RunnablePlatform and your Custom-Command.
 
+![RunnablePlatform shows accessories](apple-home-app.png?raw=true "RunnablePlatform shows accessories")
+
 - Development Webpage: <https://github.com/patineboot/runnable-platform>
 - Publishing Webpage: <https://www.npmjs.com/package/homebridge-runnable-platform>
 
