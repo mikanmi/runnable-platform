@@ -278,14 +278,12 @@ class InfraredRunnable:
             selected_code.append("sirene_on-off")
             current_state = active  # ACTIVE or INACTIVE
 
-            LOGGER.debug(f"END: {selected_code}, {current_state}")
-            return selected_code, current_state
-
-        # the 'Active' element is 'INACTIVE'
+        # return if the 'Active' element is 'INACTIVE'
         if active == 0:
             LOGGER.debug(f"END: {selected_code}, {current_state}")
             return selected_code, current_state
 
+        # do the followings if the 'Active' element is 'ACTIVE'
         # AUTO or HUMIDIFIER_OR_DEHUMIDIFIER
         if target_humidifier_dehumidifier_state == 0:
             selected_code.append("sirene_auto")
@@ -301,6 +299,7 @@ class InfraredRunnable:
                 selected_code.append("sirene_minus")
                 selected_code.append("sirene_plus")
             else:
+                selected_code.append("sirene_plus")
                 selected_code.append("sirene_plus")
                 selected_code.append("sirene_plus")
         # DEHUMIDIFIER
