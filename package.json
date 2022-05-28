@@ -2,7 +2,7 @@
   "private": false,
   "displayName": "Homebridge RunnablePlatform",
   "name": "homebridge-runnable-platform",
-  "version": "0.9.2",
+  "version": "0.9.3",
   "description": "RunnablePlatform provide connections using your Custom-Command command between infrared devices and Homebridge.",
   "license": "CC BY-NC-ND 4.0",
   "repository": {
@@ -13,8 +13,8 @@
     "url": "https://github.com/patineboot/runnable-platform/issues"
   },
   "engines": {
-    "node": ">=16.13.2",
-    "homebridge": ">=1.4.0"
+    "node": ">=16.15.0",
+    "homebridge": ">=1.4.1"
   },
   "main": "src/index.js",
   "type": "module",
@@ -30,7 +30,7 @@
     "Runnable"
   ],
   "devDependencies": {
-    "homebridge": "^1.4.0"
+    "homebridge": "^1.4.1"
   },
   "scripts": {}
 }

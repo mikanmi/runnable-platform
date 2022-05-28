@@ -214,8 +214,8 @@ class Subprocess
             this.#retry = 0;
         }
         else {
-            // the text is wrote.
-            // establish a connection to a new running sub process.
+            // the text is wrote but failed.
+            // establish a new connection to a sub process.
             LOG.warn(`writing in subprocess stdin might fail due to full`);
             this.terminate();
             this.#rerun();

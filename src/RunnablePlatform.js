@@ -45,6 +45,12 @@ export class RunnablePlatform {
     static #instance;
 
     /**
+     * Inactive mode.
+     * @type {boolean}
+     */
+    #skeltonMode = false;
+
+    /**
      * store restored cached accessories here.
      * @type {import("homebridge").PlatformAccessory<import("homebridge").UnknownContext>[]}
      */
@@ -77,7 +83,12 @@ export class RunnablePlatform {
         RunnablePlatform.#instance = this;
 
         // verify the my 'platform' element on the config.json file.
-        this.#verifyElement(CONFIG);
+        if (!this.#verifyElement(CONFIG)) {
+            this.#skeltonMode = true;
+            LOG.warn('Missing the mandatory element[s] of RunnablePlatform.');
+            LOG.warn('Add the mandatory elements of RunnablePlatform to the Config of Homebridge.');
+            return;
+        }
 
         // set a command and an interval time to communicator.
         Communicator.setCommandLine(CONFIG.run, CONFIG.time);
@@ -87,6 +98,10 @@ export class RunnablePlatform {
          * registering any new accessories.
          */
         HAPI.on('didFinishLaunching', () => {
+            if (this.#skeltonMode) {
+                LOG.warn('RunnablePlatform Plugin is running on the Skelton mode.');
+                return;
+            }
             this.#didFinishLaunching();
         });
 
@@ -94,6 +109,10 @@ export class RunnablePlatform {
          * This event is fired when homebridge got shutdown.
          */
         HAPI.on('shutdown', () => {
+            if (this.#skeltonMode) {
+                LOG.warn('RunnablePlatform Plugin is running on the Skelton mode.');
+                return;
+            }
             const comm = Communicator.getInstance();
             comm.disconnect();
         });
@@ -105,6 +124,11 @@ export class RunnablePlatform {
      * @param {import("homebridge").PlatformAccessory<import("homebridge").UnknownContext>} accessory
      */
     configureAccessory(accessory) {
+        if (this.#skeltonMode) {
+            LOG.warn('RunnablePlatform Plugin is running on the Skelton mode.');
+            return;
+        }
+
         // check the restored accessory is not described on the config file
         let valid = '';
         const found = this.#findConfigAccessory(accessory.UUID);
@@ -158,13 +182,15 @@ export class RunnablePlatform {
     
     /**
      * @param {import("homebridge").PlatformConfig} config
+     * @returns {boolean}
      */
     #verifyElement(config) {
         // the platform element must have the these elements on config file.
         if (!('run' in config &&
                 'time' in config &&
                 'accessories' in config)) {
-            throw new SyntaxError('missing the run, time, or accessories elements in the platform element on the config file.');
+            LOG.error("missing the 'run', 'time', or 'accessories' elements in the platform element on the config file.");
+            return false;
         }
 
         LOG.info(`${PLATFORM_NAME} element has them on config.json`);
@@ -180,8 +206,11 @@ export class RunnablePlatform {
                 .filter((/** @type {any} */ acc) => 'characteristics' in acc);
 
         if (corrects.length != config.accessories.length) {
-            throw new SyntaxError('missing the name, service, or characteristics element on the config file.');
+            LOG.error("missing the 'name', 'service', or 'characteristics' element on the config file.");
+            return false;
         }
+
+        return true;
     }
 
     #startServices() {

@@ -124,10 +124,26 @@ _RunnablePlatform_ **--[JSON message]->** _Custom-Command_
 {
     "method": "SET",
     "name": "Your Light",
+    "id": 1,
     "characteristic": "On",
     "value": true,
-    "status" {
+    "status": {
         "On": false,
+        "Brightness": 100,
+        "ColorTemperature": 500,
+        "Hue": 360,
+        "Saturation": 100
+    }
+}
+```
+
+```json
+{
+    "method": "ACK",
+    "name": "Your Light",
+    "id": 1,
+    "status": {
+        "On": true,
         "Brightness": 100,
         "ColorTemperature": 500,
         "Hue": 360,
@@ -174,7 +190,7 @@ My list of infrared home devices:
 
 InfraredRunnable involves some useful files:
 
-- *codes.json*  
+- _codes.json_  
   involves some infrared codes of '[cgir][IndoorCorgi-cgir].'
 
 - *example.install_runnable.sh*  
