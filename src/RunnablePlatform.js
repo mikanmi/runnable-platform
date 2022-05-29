@@ -48,7 +48,7 @@ export class RunnablePlatform {
      * Inactive mode.
      * @type {boolean}
      */
-    #skeltonMode = false;
+    #skeletonMode = false;
 
     /**
      * store restored cached accessories here.
@@ -84,7 +84,7 @@ export class RunnablePlatform {
 
         // verify the my 'platform' element on the config.json file.
         if (!this.#verifyElement(CONFIG)) {
-            this.#skeltonMode = true;
+            this.#skeletonMode = true;
             LOG.warn('Missing the mandatory element[s] of RunnablePlatform.');
             LOG.warn('Add the mandatory elements of RunnablePlatform to the Config of Homebridge.');
             return;
@@ -98,7 +98,7 @@ export class RunnablePlatform {
          * registering any new accessories.
          */
         HAPI.on('didFinishLaunching', () => {
-            if (this.#skeltonMode) {
+            if (this.#skeletonMode) {
                 LOG.warn('RunnablePlatform Plugin is running on the Skelton mode.');
                 return;
             }
@@ -109,7 +109,7 @@ export class RunnablePlatform {
          * This event is fired when homebridge got shutdown.
          */
         HAPI.on('shutdown', () => {
-            if (this.#skeltonMode) {
+            if (this.#skeletonMode) {
                 LOG.warn('RunnablePlatform Plugin is running on the Skelton mode.');
                 return;
             }
@@ -124,7 +124,7 @@ export class RunnablePlatform {
      * @param {import("homebridge").PlatformAccessory<import("homebridge").UnknownContext>} accessory
      */
     configureAccessory(accessory) {
-        if (this.#skeltonMode) {
+        if (this.#skeletonMode) {
             LOG.warn('RunnablePlatform Plugin is running on the Skelton mode.');
             return;
         }

@@ -262,6 +262,10 @@ I am tired of updating my command to only fit his CMD4 anymore.
 
 ## Publish RunnablePlatform on NPM for patine
 
+1. Update
+
+   Update the value of 'version' on `package.json`.
+
 1. Login
 
    ```bash
@@ -287,4 +291,18 @@ I am tired of updating my command to only fit his CMD4 anymore.
 
    ```bash
    npm logout
+   ```
+
+## Install Local RunnablePlatform
+
+1. Clone
+
+   ```bash
+   git clone https://github.com/patineboot/runnable-platform.git
+   ```
+
+1. Install
+
+   ```bash
+   sudo npm -g install ./runnable-platform/
    ```
