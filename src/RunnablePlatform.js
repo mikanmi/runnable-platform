@@ -82,17 +82,6 @@ export class RunnablePlatform {
 
         RunnablePlatform.#instance = this;
 
-        // verify the my 'platform' element on the config.json file.
-        if (!this.#verifyElement(CONFIG)) {
-            this.#skeletonMode = true;
-            LOG.warn('Missing the mandatory element[s] of RunnablePlatform.');
-            LOG.warn('Add the mandatory elements of RunnablePlatform to the Config of Homebridge.');
-            return;
-        }
-
-        // set a command and an interval time to communicator.
-        Communicator.setCommandLine(CONFIG.run, CONFIG.time);
-
         /**
          * Platforms should wait until the "didFinishLaunching" event has fired before
          * registering any new accessories.
@@ -116,6 +105,17 @@ export class RunnablePlatform {
             const comm = Communicator.getInstance();
             comm.disconnect();
         });
+
+        // verify the my 'platform' element on the config.json file.
+        if (!this.#verifyElement(CONFIG)) {
+            this.#skeletonMode = true;
+            LOG.warn('Missing the mandatory element[s] of RunnablePlatform.');
+            LOG.warn('Add the mandatory elements of RunnablePlatform to the Config of Homebridge.');
+            return;
+        }
+
+        // set a command and an interval time to communicator.
+        Communicator.setCommandLine(CONFIG.run, CONFIG.time);
     }
 
     /**
