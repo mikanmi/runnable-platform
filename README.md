@@ -262,33 +262,30 @@ I am tired of updating my command to only fit his CMD4 anymore.
 
 ## Publish RunnablePlatform on NPM for patine
 
-1. Update
-
-   Update the value of 'version' on `package.json`.
-
+1. Update  
+   1. Update the value of 'version' on `package.json`.
+   1. Update the value of 'version' on `package-lock.json`.  
+      ```bash
+      rm -rf node_modules
+      rm package-lock.json
+      npm install ../runnable-platform/
+      ```
 1. Login
-
    ```bash
    npm login
    ```
-
    npm asks
-
    ```bash
    Username: patine
    Password: <your password>
    Email: (this IS public) <your email address>
    Enter one-time password: <one time password on received email>
    ```
-
 1. Publish
-
    ```bash
    npm publish
    ```
-
 1. Logout
-
    ```bash
    npm logout
    ```
