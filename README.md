@@ -264,7 +264,7 @@ I am tired of updating my command to only fit his CMD4 anymore.
 
 1. Update  
    1. Update the value of 'version' on `package.json`.
-   1. Update the value of 'version' on `package-lock.json`.  
+   1. Update the `package-lock.json`.  
       ```bash
       rm -rf node_modules
       rm package-lock.json

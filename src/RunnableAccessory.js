@@ -52,17 +52,23 @@ export class RunnableAccessory {
     constructor(accessoryConfig) {
         LOG.debug(`Enter ${this.constructor.name}: ${accessoryConfig} -> name: ${accessoryConfig.name}`);
 
-        this.#lock = new Lock();
+        try {
+            this.#lock = new Lock();
 
-        this.#accessoryConfig = accessoryConfig;
+            this.#accessoryConfig = accessoryConfig;
 
-        const comm = Communicator.getInstance();
-        comm.on('message', (message) => {
-            if (message.name !== this.name) {
-                return;
-            }
-            this.updateCharacteristic(message.characteristic, message.value);
-        });
+            const comm = Communicator.getInstance();
+            comm.on('message', (message) => {
+                if (message.name !== this.name) {
+                    return;
+                }
+                this.updateCharacteristic(message.characteristic, message.value);
+            });
+        }
+        catch (error) {
+            LOG.info(`${this.constructor.name}: ${accessoryConfig} -> name: ${accessoryConfig.name}`);
+            throw error;
+        }
     }
 
     /**

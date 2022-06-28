@@ -87,23 +87,36 @@ export class RunnablePlatform {
          * registering any new accessories.
          */
         HAPI.on('didFinishLaunching', () => {
-            if (this.#skeletonMode) {
-                LOG.warn('RunnablePlatform Plugin is running on the Skelton mode.');
+            try {
+                if (this.#skeletonMode) {
+                    LOG.warn('RunnablePlatform Plugin is running on the Skelton mode.');
+                    return;
+                }
+                this.#didFinishLaunching();
+            }
+            catch (error) {
+                LOG.error('Unexpected error occurs.', error);
                 return;
             }
-            this.#didFinishLaunching();
         });
 
         /**
          * This event is fired when homebridge got shutdown.
          */
         HAPI.on('shutdown', () => {
-            if (this.#skeletonMode) {
-                LOG.warn('RunnablePlatform Plugin is running on the Skelton mode.');
+            try {
+                if (this.#skeletonMode) {
+                    LOG.warn('RunnablePlatform Plugin is running on the Skelton mode.');
+                    return;
+                }
+                const comm = Communicator.getInstance();
+                comm.disconnect();
+                LOG.info('Bye.');
+            }
+            catch (error) {
+                LOG.error('Unexpected error occurs.', error);
                 return;
             }
-            const comm = Communicator.getInstance();
-            comm.disconnect();
         });
 
         // verify the my 'platform' element on the config.json file.
@@ -124,24 +137,30 @@ export class RunnablePlatform {
      * @param {import("homebridge").PlatformAccessory<import("homebridge").UnknownContext>} accessory
      */
     configureAccessory(accessory) {
-        if (this.#skeletonMode) {
-            LOG.warn('RunnablePlatform Plugin is running on the Skelton mode.');
+        try {
+            if (this.#skeletonMode) {
+                LOG.warn('RunnablePlatform Plugin is running on the Skelton mode.');
+                return;
+            }
+
+            // check the restored accessory is not described on the config file
+            let valid = '';
+            const found = this.#findConfigAccessory(accessory.UUID);
+            if (found) {
+                this.#accessories.push(accessory);
+                valid = 'restored';
+            }
+            else {
+                // remove the accessory from cache later.
+                this.#invalidAccessories.push(accessory);
+                valid = 'disposed';
+            }
+            LOG.info(`Saved accessory: ${accessory.displayName} is ${valid}`);
+        }
+        catch (error) {
+            LOG.error('Unexpected error occurs.', error);
             return;
         }
-
-        // check the restored accessory is not described on the config file
-        let valid = '';
-        const found = this.#findConfigAccessory(accessory.UUID);
-        if (found) {
-            this.#accessories.push(accessory);
-            valid = 'restored';
-        }
-        else {
-            // remove the accessory from cache later.
-            this.#invalidAccessories.push(accessory);
-            valid = 'VOID';
-        }
-        LOG.info(`Configure Accessory ${valid}: ${accessory.displayName}`);
     }
     
     /**
@@ -224,8 +243,6 @@ export class RunnablePlatform {
                 runnable.startService(accessory);
                 // update the new platform accessory
                 HAPI.updatePlatformAccessories([accessory]);
-
-                LOG.info(`Cached Accessory name:[${runnable.name}] type:[${runnable.serviceType}]`);
             }
             // otherwise, we create a new platform accessory
             else {
@@ -236,8 +253,9 @@ export class RunnablePlatform {
                 // register the new platform accessory
                 HAPI.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
 
-                LOG.info(`New Accessory name:[${runnable.name}] type:[${runnable.serviceType}]`);
+                LOG.info(`New accessory is added: name:[${runnable.name}] service:[${runnable.serviceType}]`);
             }
+            LOG.info(`accessory started. name:[${runnable.name}] service:[${runnable.serviceType}]`);
         }
     }
 }
