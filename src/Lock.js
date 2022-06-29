@@ -48,19 +48,19 @@ export class Lock {
      * Wait on the release if anyone has acquired it already.
      */
     acquire() {
-        return new Promise((resolve) => {
+        return new Promise((resolve, _reject) => {
 
             const notifier = () => {
                 if (!this.#acquired) {
                     this.#acquired = true;
                     this.#eventEmitter.removeListener('released', notifier);
-                    return resolve();
+                    return resolve('dummy');
                 }
             }
 
             if (!this.#acquired) {
                 this.#acquired = true;
-                return resolve();
+                return resolve('dummy');
             }
             this.#eventEmitter.on('released', notifier);
         });

@@ -119,11 +119,15 @@ export class RunnablePlatform {
             }
         });
 
-        // verify the my 'platform' element on the config.json file.
-        if (!this.#verifyElement(CONFIG)) {
+        // verify the RunnablePlatform platform element of the platforms element on the config.json file.
+        try {
+            this.#verifyConfig(CONFIG);
+        }
+        catch (error) {
             this.#skeletonMode = true;
-            LOG.warn('Missing the mandatory element[s] of RunnablePlatform.');
-            LOG.warn('Add the mandatory elements of RunnablePlatform to the Config of Homebridge.');
+            LOG.error('RunnablePlatform found the incorrected element on the config.json file.');
+            LOG.error(error);
+            LOG.error("Correct your description of the RunnablePlatform platform element.");
             return;
         }
 
@@ -198,43 +202,88 @@ export class RunnablePlatform {
         Communicator.getInstance().connect();
     }
 
-    
     /**
      * @param {import("homebridge").PlatformConfig} config
-     * @returns {boolean}
+     * @returns {boolean} true if config is corrected.
+     * @throws {Error} occur if config is invalid.
      */
-    #verifyElement(config) {
+    #verifyConfig(config) {
+        const platResult = this.#verifyPlatform(config);
+
+        let accResult = false;
+        for (let configAccessory of config.accessories) {
+            accResult = this.#verifyAccessory(configAccessory);
+        }
+
+        return platResult && accResult;
+    }
+
+    /**
+     * @param {import("homebridge").PlatformConfig} configPlatform
+     * @returns {boolean} always true.
+     * @throws {Error} occur if configPlatform is invalid.
+     */
+    #verifyPlatform(configPlatform) {
         // the platform element must have the these elements on config file.
-        if (!('run' in config &&
-                'time' in config &&
-                'accessories' in config)) {
-            LOG.error("missing the 'run', 'time', or 'accessories' elements in the platform element on the config file.");
-            return false;
+        if (!('run' in configPlatform &&
+                'time' in configPlatform &&
+                'accessories' in configPlatform)) {
+            throw new Error(
+                "missing the 'run', 'time', or 'accessories' elements in the platform element on the config file."
+            );
         }
 
         LOG.info(`${PLATFORM_NAME} element has them on config.json`);
-        LOG.info('  name: ' + config.name);
-        LOG.info('  run: ' + config.run);
-        LOG.info('  time(ms): ' + config.time);
-        LOG.info('  accessories length: ' + config.accessories.length);
+        LOG.info('  name: ' + configPlatform.name);
+        LOG.info('  run: ' + configPlatform.run);
+        LOG.info('  time(ms): ' + configPlatform.time);
+        LOG.info('  accessories length: ' + configPlatform.accessories.length);
 
         // an element of the 'accessories' array must have the these elements on config file.
-        const corrects = config.accessories
+        const corrects = configPlatform.accessories
                 .filter((/** @type {any} */ acc) => 'name' in acc)
                 .filter((/** @type {any} */ acc) => 'service' in acc)
                 .filter((/** @type {any} */ acc) => 'characteristics' in acc);
 
-        if (corrects.length != config.accessories.length) {
-            LOG.error("missing the 'name', 'service', or 'characteristics' element on the config file.");
-            return false;
+        if (corrects.length != configPlatform.accessories.length) {
+            throw new Error(
+                "missing the 'name', 'service', or 'characteristics' element on the config file."
+            );
+        }
+        return true;
+    }
+
+    /**
+     * @param {any} configAccessory
+     * @returns {boolean} always true
+     * @throws {Error} occur if configAccessory is invalid.
+     */
+    #verifyAccessory(configAccessory) {
+        const serviceResult = configAccessory.service in HAPI.hap.Service;
+        if (!serviceResult) {
+            throw new Error(
+                `Found the incorrected service name on the config file: "${configAccessory.service}"`
+            );
         }
 
-        return true;
+        let charaResult = false;
+        for (let characteristic of configAccessory.characteristics) {
+            charaResult = characteristic in HAPI.hap.Characteristic;
+            if (!charaResult) {
+                throw new Error(
+                    `Found the incorrected characteristic name on the config file: "${characteristic}"`
+                );
+            }
+        }
+        return serviceResult && charaResult;
     }
 
     #startServices() {
         // start the services of the accessories described on the config file.
         for (let configAccessory of CONFIG.accessories) {
+
+
+
             // create the device accessory from the config
             const runnable = new RunnableAccessory(configAccessory);
             let accessory = this.#findAccessory(configAccessory.name);

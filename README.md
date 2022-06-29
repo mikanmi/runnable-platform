@@ -301,5 +301,5 @@ I am tired of updating my command to only fit his CMD4 anymore.
 1. Install
 
    ```bash
-   sudo npm -g install ./runnable-platform/
+   sudo npm --location=global install ./runnable-platform/
    ```
