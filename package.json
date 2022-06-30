@@ -30,7 +30,6 @@
     "Runnable"
   ],
   "devDependencies": {
-    "homebridge": "^1.4.1"
   },
   "scripts": {}
 }
