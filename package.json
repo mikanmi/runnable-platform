@@ -28,7 +28,7 @@
     "Command",
     "Runnable"
   ],
-  "devDependencies": {
+  "dependencies": {
     "homebridge": ">=1.5.0"
   },
   "scripts": {}
