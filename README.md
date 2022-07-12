@@ -253,7 +253,7 @@ I strongly recommend [RPZ-IR-Sensor][RPZ-IR-Sensor] to send infrared codes becau
 
 ## No Thanks
 
-@[Homebridge and its Organization Collaborators](https://github.com/homebridge)  
+[Homebridge and its Organization Collaborators](https://github.com/homebridge)  
 Overall, The Verified By Homebridge program is a FRAUD.
 
 > I solved my plugin soon from the requests of @donavanbecker.  
