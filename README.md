@@ -253,12 +253,15 @@ I strongly recommend [RPZ-IR-Sensor][RPZ-IR-Sensor] to send infrared codes becau
 
 ## No Thanks
 
+@[Homebridge and its Organization Collaborators](https://github.com/homebridge)  
+Overall, The Verified By Homebridge program is a FRAUD.
+
+> I solved my plugin soon from the requests of @donavanbecker.  
+> @donavanbecker respond very late and is ignoring the import bug at Homebridge.
+
+The member of Homebridge replied very late every time, and 3 months later, finally, He ignored my proposal.
+
 [Bit Trade One, LTD.](https://bit-trade-one.co.jp) (ADRSIR design, manufacturing, and sales) provides **NO** supports and the **USELESS** scripts. Bit Trade One provides bad and poor deliverables.
-
-@[ztalbot2000](https://github.com/ztalbot2000)
-
-He has released [Homebridge CMD4](https://github.com/ztalbot2000/homebridge-cmd4) involving  non-compatible changes frequently.  
-I am tired of updating my command to only fit his CMD4 anymore.
 
 ## Publish RunnablePlatform on NPM for patine
 
