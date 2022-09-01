@@ -1,6 +1,6 @@
 {
     "bridge": {
-        "name": "Aya",
+        "name": " Bikini",
         "username": "0E:26:1F:4A:39:CB",
         "manufacturer": "Patineboot",
         "model": "homebridge",
@@ -64,14 +64,14 @@
                     ]
                 },
                 {
-                    "name": "Aya Humidity",
+                    "name": "Bikini Humidity",
                     "service": "HumiditySensor",
                     "characteristics": [
                         "CurrentRelativeHumidity"
                     ]
                 },
                 {
-                    "name": "Aya Temperature",
+                    "name": "Bikini Temperature",
                     "service": "TemperatureSensor",
                     "characteristics": [
                         "CurrentTemperature"
