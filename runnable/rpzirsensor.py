@@ -82,10 +82,10 @@ class RpzIrSensor:
 
         while not self.__stopped:
             bme280.forced()
-            humidity_message = self.__make_message("Aya Humidity", "CurrentRelativeHumidity", bme280.humidity)
+            humidity_message = self.__make_message("Bikini Humidity", "CurrentRelativeHumidity", bme280.humidity)
             self.__sender.send(humidity_message)
 
-            temperature_message = self.__make_message("Aya Temperature", "CurrentTemperature", bme280.temperature)
+            temperature_message = self.__make_message("Bikini Temperature", "CurrentTemperature", bme280.temperature)
             self.__sender.send(temperature_message)
 
             sleep(10)
