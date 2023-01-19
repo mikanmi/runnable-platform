@@ -4,8 +4,6 @@
 [IndoorCorgi]: https://github.com/IndoorCorgi
 [IndoorCorgi-cgir]: https://github.com/IndoorCorgi/cgir
 [IndoorCorgi-cgsensor]: https://github.com/IndoorCorgi/cgsensor
-[ADRSIR]: https://bit-trade-one.co.jp/product/module/adrsir/
-[adrsirlib]: https://github.com/tokieng/adrsirlib
 [Homebridge-Service-Type]: https://developers.homebridge.io/#/service
 
 RunnablePlatform is the Homebridge plugin that connects many infrared home devices with Homebridge using Custom-Command.
@@ -215,7 +213,7 @@ Homebridge UI provides Swagger:
        Memo: We already get 'the cached accessories' with Swagger on Homebridge.
    - Web socket  
      RunnablePlatform sends the state to change by user interaction on Apple Home app or Siri.
-1. RunnablePlatform supports of updating the properties for some characteristics in  future.
+1. RunnablePlatform supports updating the properties for some characteristics in the future.
 
    ```json
    {
