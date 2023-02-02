@@ -179,7 +179,6 @@ My list of infrared home devices:
 |Product Name|Constructor|Service Type|
 |-|-|-|
 |RPZ-IR-Sensor|Indoor Corgi|HumiditySensor and TemperatureSensor|
-|Serene|Francfranc|HumidifierDehumidifier|
 |A ceiling light|Panasonic|LightBulb|
 |A ceiling light|Panasonic|LightBulb|
 |An air-conditioner|N/A|HeaterCooler|

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Copyright (c) 2020, 2021, 2022, Patineboot. All rights reserved.
+# Copyright (c) 2020-2023 Patineboot. All rights reserved.
 # InfraredRunnable is licensed under CC BY-NC-ND 4.0.
 
 # Attribution-NonCommercial-NoDerivatives 4.0 International
@@ -105,17 +105,11 @@ class InfraredRunnable:
             "AirConditioner",
         ]
 
-        humidifierdehumidifier_name = [
-            "Sirene",
-        ]
-
         device_name = message["name"]
         if device_name in lightbulb_name:
             self.__handle_lightbulb(message, lightbulb_name)
         elif device_name in heatercooler_name:
             self.__handle_heatercooler(message)
-        elif device_name in humidifierdehumidifier_name:
-            self.__handle_humidifierdehumidifier(message)
 
     def __handle_lightbulb(self, message, lightbulb_name):
         LOGGER.debug(f"STR: {message}, {lightbulb_name}")
@@ -220,12 +214,21 @@ class InfraredRunnable:
             # 'HEAT' in 'TargetHeaterCoolerState'
             elif target_heater_cooler_state == 1:
                 current_state = 2  # HEATING
-                if heating_threshold_temperature == 25:
-                    selected_code = " aircon_warm-26-full-swing"
+                if heating_threshold_temperature >= 25:
+                    selected_code = "aircon_warm-26-full-swing"
                     temperature = 25
-                else:
+                elif heating_threshold_temperature >= 23:
+                    selected_code = "aircon_warm-24-auto"
+                    temperature = 24
+                elif heating_threshold_temperature >= 21:
                     selected_code = "aircon_warm-22-auto"
                     temperature = 22
+                elif heating_threshold_temperature >= 19:
+                    selected_code = "aircon_warm-20-auto"
+                    temperature = 20
+                else:
+                    selected_code = "aircon_warm-18-auto"
+                    temperature = 18
             # 'COOL' in 'TargetHeaterCoolerState'
             elif target_heater_cooler_state == 2:
                 selected_code = "aircon_cool-26-auto"
@@ -235,80 +238,6 @@ class InfraredRunnable:
         LOGGER.debug(f"END: {selected_code}, {current_state}, {temperature}")
         return selected_code, current_state, temperature
 
-    def __handle_humidifierdehumidifier(self, message):
-        LOGGER.debug(f"STR: {message}")
-
-        active_status = message["status"]["Active"]
-
-        # chaneg the device state to the status.
-        state = {
-            "Active": message["status"]["Active"],
-            "TargetHumidifierDehumidifierState": message["status"]["TargetHumidifierDehumidifierState"],
-            "RelativeHumidityHumidifierThreshold": message["status"]["RelativeHumidityHumidifierThreshold"],
-        }
-        state[message["characteristic"]] = message["value"]
-
-        infrareds, current_state = \
-            self.__select_humidifierdehumidifier_code(state, active_status)
-
-        for infrared in infrareds:
-            self.__ir_sensor.flash(infrared)
-
-        # make the message to send the device status from the receive message
-        # update the status in the message
-        message["status"][message["characteristic"]] = message["value"]
-        # send CurrentHumidifierDehumidifierState due to TargetHumidifierDehumidifierState
-        message["characteristic"] = "CurrentHumidifierDehumidifierState"
-        message["value"] = current_state
-        self.send(message)
-
-    def __select_humidifierdehumidifier_code(self, state, active_status):
-        LOGGER.debug(f"STR: {state}, {active_status}")
-
-        # select an infrared code with the 'Active' and 'TargetHumidifierDehumidifierState' attributes.
-        selected_code = []
-        current_state = 0
-
-        active = state["Active"]
-        target_humidifier_dehumidifier_state = state["TargetHumidifierDehumidifierState"]
-        relative_humidity_humidifier_threshold = state["RelativeHumidityHumidifierThreshold"]
-
-        # change the power switch to ON or OFF
-        if active != active_status:
-            selected_code.append("sirene_on-off")
-            current_state = active  # ACTIVE or INACTIVE
-
-        # return if the 'Active' element is 'INACTIVE'
-        if active == 0:
-            LOGGER.debug(f"END: {selected_code}, {current_state}")
-            return selected_code, current_state
-
-        # do the followings if the 'Active' element is 'ACTIVE'
-        # AUTO or HUMIDIFIER_OR_DEHUMIDIFIER
-        if target_humidifier_dehumidifier_state == 0:
-            selected_code.append("sirene_auto")
-            current_state = 2  # HUMIDIFYING
-        # HUMIDIFIER
-        elif target_humidifier_dehumidifier_state == 1:
-            current_state = 2  # HUMIDIFYING
-            if relative_humidity_humidifier_threshold < 34:
-                selected_code.append("sirene_minus")
-                selected_code.append("sirene_minus")
-            elif relative_humidity_humidifier_threshold < 67:
-                selected_code.append("sirene_minus")
-                selected_code.append("sirene_minus")
-                selected_code.append("sirene_plus")
-            else:
-                selected_code.append("sirene_plus")
-                selected_code.append("sirene_plus")
-                selected_code.append("sirene_plus")
-        # DEHUMIDIFIER
-        elif target_humidifier_dehumidifier_state == 2:
-            # nothing to do
-            LOGGER.warn(f"Sirene does not have the DEHUMIDIFIER feature")
-
-        LOGGER.debug(f"END: {selected_code}, {current_state}")
-        return selected_code, current_state
 
     def send(self, message):
         self.__lock.acquire()

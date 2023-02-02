@@ -53,17 +53,6 @@
                     ]
                 },
                 {
-                    "name": "Sirene",
-                    "service": "HumidifierDehumidifier",
-                    "characteristics": [
-                        "Active",
-                        "CurrentHumidifierDehumidifierState",
-                        "TargetHumidifierDehumidifierState",
-                        "CurrentRelativeHumidity",
-                        "RelativeHumidityHumidifierThreshold"
-                    ]
-                },
-                {
                     "name": "Bikini Humidity",
                     "service": "HumiditySensor",
                     "characteristics": [
